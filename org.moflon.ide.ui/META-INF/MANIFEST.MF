@@ -40,7 +40,8 @@ Require-Bundle:
  org.moflon.core.build,
  org.moflon.sdm.constraints.operationspecification,
  org.eclipse.emf.ecore.xmi,
- org.moflon.sdm.constraints.constraintstodemocles
+ org.moflon.sdm.constraints.constraintstodemocles,
+ org.moflon.tgg.language
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.moflon.ide.ui,

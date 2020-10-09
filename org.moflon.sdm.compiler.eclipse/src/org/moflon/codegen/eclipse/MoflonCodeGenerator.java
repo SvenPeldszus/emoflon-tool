@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.JobGroup;
-import org.eclipse.emf.codegen.ecore.generator.GeneratorAdapterFactory.Descriptor;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.common.util.BasicMonitor;
 import org.eclipse.emf.ecore.EPackage;
@@ -27,7 +26,6 @@ import org.gervarro.eclipse.task.ITask;
 import org.moflon.codegen.MethodBodyHandler;
 import org.moflon.core.preferences.EMoflonPreferencesStorage;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainer;
-import org.moflon.core.propertycontainer.MoflonPropertiesContainerHelper;
 import org.moflon.core.utilities.WorkspaceHelper;
 import org.moflon.emf.build.GenericMoflonProcess;
 import org.moflon.emf.build.MonitoredGenModelBuilder;
@@ -74,7 +72,7 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			final EPackage ePackage = (EPackage) resource.getContents().get(0);
 
 			// (1) Instantiate code generation engine
-			final String engineID = MoflonPropertiesContainerHelper.getMethodBodyHandler(getMoflonProperties());
+			final String engineID = "org.moflon.compiler.sdm.democles.reversenavigation.ReverseNavigationCodeGeneratorConfig";
 			final MethodBodyHandler methodBodyHandler = (MethodBodyHandler) Platform.getAdapterManager()
 					.loadAdapter(this, engineID);
 			subMon.worked(5);
@@ -107,7 +105,8 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			final JobGroup jobGroup = new JobGroup("Validation job group", 1, 1);
 			validationJob.setJobGroup(jobGroup);
 			validationJob.schedule();
-			final int timeoutForValidationTaskInMillis = getPreferencesStorage().getValidationTimeout();
+			EMoflonPreferencesStorage preferencesStorage = getPreferencesStorage();
+			final int timeoutForValidationTaskInMillis = preferencesStorage.getInt(EMoflonPreferencesStorage.KEY_VALIDATION_TIMEOUT);
 			jobGroup.join(timeoutForValidationTaskInMillis, subMon.split(10));
 
 			if (validationJob.getResult() == null) {
@@ -179,8 +178,9 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 
 			// (6) Generate code
 			subMon.subTask("Generating code for project " + project.getName());
-			final Descriptor codeGenerationEngine = methodBodyHandler.createCodeGenerationEngine(this, resource);
-			final CodeGenerator codeGenerator = new CodeGenerator(codeGenerationEngine);
+//			final Descriptor codeGenerationEngine = methodBodyHandler.createCodeGenerationEngine(this, resource);
+//			final CodeGenerator codeGenerator = new CodeGenerator(codeGenerationEngine);
+			final CodeGenerator codeGenerator = new CodeGenerator();
 			final IStatus codeGenerationStatus = codeGenerator.generateCode(genModel,
 					new BasicMonitor.EclipseSubProgress(subMon, 30));
 			if (subMon.isCanceled()) {

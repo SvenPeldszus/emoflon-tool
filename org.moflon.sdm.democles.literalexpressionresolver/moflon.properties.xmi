@@ -8,7 +8,7 @@
   <additionalDependencies value="platform:/plugin/org.gervarro.democles.specification.emf/model/relational.ecore"/>
   <metaModelProject MetaModelProjectName="org.moflon.sdm.compiler.democles.specification"/>
   <replaceGenModel/>
-  <sdmCodegeneratorHandlerId/>
+
   <importMappings key="specification" value="org.gervarro.democles.specification.emf"/>
   <additionalUsedGenPackages value="platform:/plugin/org.gervarro.democles.specification.emf/model/specification.genmodel"/>
   <additionalUsedGenPackages value="platform:/plugin/org.gervarro.democles.specification.emf/model/emf.genmodel"/>

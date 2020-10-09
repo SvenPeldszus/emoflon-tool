@@ -74,8 +74,8 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 			final CompilerPattern compilerPattern = patternMatcher.compilePattern(pattern, adornment);
 			final CompilerPatternBody body = compilerPattern.getBodies().get(0);
 			final ReachabilityAnalyzer reachabilityAnalyzer;
-			if (preferencesStorage.getReachabilityEnabled()) {
-				final int maximumAdornmentSize = preferencesStorage.getMaximumAdornmentSize();
+			if (preferencesStorage.getBoolean(EMoflonPreferencesStorage.KEY_REACHABILITY_ENABLED)) {
+				final int maximumAdornmentSize = preferencesStorage.getInt(EMoflonPreferencesStorage.KEY_REACHABILITY_MAX_ADORNMENT_SIZE);
 				reachabilityAnalyzer = maximumAdornmentSize == EMoflonPreferencesStorage.REACHABILITY_MAX_ADORNMENT_SIZE_INFINITY //
 						? new BDDReachabilityAnalyzer() //
 						: new BDDReachabilityAnalyzer(maximumAdornmentSize);

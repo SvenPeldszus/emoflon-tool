@@ -3,7 +3,6 @@ package org.moflon.compiler.sdm.democles.eclipse;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.emf.ecore.EPackage;
@@ -13,9 +12,9 @@ import org.gervarro.eclipse.task.ITask;
 import org.moflon.compiler.sdm.democles.DefaultValidatorConfig;
 import org.moflon.compiler.sdm.democles.ScopeValidationConfigurator;
 import org.moflon.core.preferences.EMoflonPreferencesStorage;
-import org.moflon.core.propertycontainer.MoflonPropertiesContainerHelper;
 import org.moflon.core.utilities.WorkspaceHelper;
 import org.moflon.emf.build.GenericMoflonProcess;
+import org.moflon.sdm.compiler.democles.validation.scope.ScopeValidator;
 
 public class DemoclesValidationProcess extends GenericMoflonProcess {
 	private final boolean shallSaveIntermediateModels;
@@ -43,20 +42,15 @@ public class DemoclesValidationProcess extends GenericMoflonProcess {
 			final Resource resource = getEcoreResource();
 			final EPackage ePackage = (EPackage) resource.getContents().get(0);
 
-			final String engineID = MoflonPropertiesContainerHelper.getMethodBodyHandler(getMoflonProperties());
-			ScopeValidationConfigurator validatorConfig = (ScopeValidationConfigurator) Platform.getAdapterManager()
-					.loadAdapter(this, engineID);
-
-			if (validatorConfig == null) {
-				validatorConfig = new DefaultValidatorConfig(getResourceSet(), this.getPreferencesStorage());
-			}
+			ScopeValidationConfigurator validatorConfig =  new DefaultValidatorConfig(getResourceSet(), this.getPreferencesStorage());
 			subMon.worked(5);
 
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
 
-			final ITask validator = new DemoclesValidatorTask(validatorConfig.createScopeValidator(), ePackage);
+			ScopeValidator scopeValidator = validatorConfig.createScopeValidator();
+			final ITask validator = new DemoclesValidatorTask(scopeValidator, ePackage);
 			final IStatus validatorStatus = validator.run(subMon.split(10));
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;

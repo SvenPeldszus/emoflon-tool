@@ -6,12 +6,10 @@ Bundle-Version: 2.3.0.qualifier
 Bundle-Vendor: eMoflon Developers
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: 
- org.eclipse.core.resources;bundle-version="[3.5.2,4.0.0)",
  org.eclipse.core.runtime;bundle-version="[3.5.0,4.0.0)",
  org.eclipse.emf.ecore.xmi;bundle-version="[2.5.0,3.0.0)",
  org.eclipse.emf.codegen.ecore;bundle-version="[2.5.0,3.0.0)",
  org.eclipse.jdt.core;bundle-version="[3.5.2,4.0.0)",
- org.eclipse.jgit;bundle-version="4.4",
  org.gervarro.eclipse.task;bundle-version="[1.0.1,2.0.0)",
  org.gervarro.eclipse.workspace.util;bundle-version="[2.0.0,3.0.0)",
  org.gervarro.eclipse.workspace.autosetup;bundle-version="[1.0.0,2.0.0)",
@@ -27,13 +25,12 @@ Require-Bundle:
  org.moflon.tgg.runtime;bundle-version="2.0.0",
  org.moflon.tgg.language;bundle-version="2.1.0",
  org.moflon.core.plugins;bundle-version="2.2.0",
- org.moflon.emf.injection,
  org.moflon.core.build,
  org.moflon.core.preferences,
  org.moflon.emf.build,
  org.moflon.emf.codegen,
- org.moflon.core.ui,
- org.moflon.core.plugins
+ org.moflon.core.plugins,
+ org.antlr.stringtemplate
 Export-Package: org.moflon.ide.core,
  org.moflon.ide.core.ea,
  org.moflon.ide.core.project,

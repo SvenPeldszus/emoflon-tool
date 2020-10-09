@@ -5,10 +5,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcoreFactory;
@@ -23,8 +21,6 @@ import org.moflon.core.ecore2mocaxmi.Ecore2mocaxmiFactory;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainerHelper;
 import org.moflon.core.utilities.WorkspaceHelper;
 import org.moflon.emf.build.MonitoredMetamodelLoader;
-import org.moflon.emf.codegen.dependency.PackageRemappingDependency;
-
 import MocaTree.Node;
 
 public class ConverterHelper {
@@ -54,14 +50,14 @@ public class ConverterHelper {
 			final IFile ecoreFile) {
 		return new MonitoredMetamodelLoader(resourceSet, ecoreFile,
 				MoflonPropertiesContainerHelper.createEmptyContainer()) {
-			@Override
-			protected void createResourcesForWorkspaceProjects(IProgressMonitor monitor) {
-				super.createResourcesForWorkspaceProjects(monitor);
-				if (isValidProject(ecoreFile.getProject())) {
-					new PackageRemappingDependency(URI.createURI(ecoreFile.getLocation().toOSString()), false, false)
-							.getResource(getResourceSet(), false, true);
-				}
-			}
+//			@Override
+//			protected void createResourcesForWorkspaceProjects(IProgressMonitor monitor) {
+//				super.createResourcesForWorkspaceProjects(monitor);
+//				if (isValidProject(ecoreFile.getProject())) {
+//					new PackageRemappingDependency(URI.createURI(ecoreFile.getLocation().toOSString()), false, false)
+//							.getResource(getResourceSet(), false, true);
+//				}
+//			}
 
 			@Override
 			protected boolean isValidProject(IProject project) {

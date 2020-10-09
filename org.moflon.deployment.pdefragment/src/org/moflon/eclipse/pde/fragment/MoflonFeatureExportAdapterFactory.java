@@ -160,7 +160,7 @@ public class MoflonFeatureExportAdapterFactory implements IAdapterFactory {
 				final IContentType contentType = description.getContentType();
 				if (contentType != null && TARGET_DEFINITION_FILE_CONTENT_TYPE_ID.equals(contentType.getId())) {
 					final ITargetPlatformService service = (ITargetPlatformService) PDECore.getDefault()
-							.acquireService(ITargetPlatformService.class.getName());
+							.acquireService(ITargetPlatformService.class);
 					return service.getTarget(file).getTargetDefinition();
 				}
 			}

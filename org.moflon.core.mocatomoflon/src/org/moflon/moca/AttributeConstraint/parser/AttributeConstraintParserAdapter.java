@@ -3,11 +3,10 @@ package org.moflon.moca.AttributeConstraint.parser;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-
 import org.antlr.runtime.ANTLRReaderStream;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
 import org.apache.log4j.Logger;
 import org.moflon.core.moca.processing.Problem;
 import org.moflon.core.moca.processing.parser.impl.ParserImpl;
