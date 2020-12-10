@@ -39,8 +39,6 @@ import org.moflon.tgg.csp.codegenerator.MyBasicFormatRenderer;
 import org.moflon.tgg.algorithm.delta.AttributeDelta;
 import org.moflon.tgg.algorithm.delta.attribute.AttributConstraintContainer;
 import org.moflon.tgg.algorithm.delta.attribute.AttributeConstraintCodeGenerator;
-import org.ST.v4.ST;
-import org.ST.v4.STGroupFile;
 import MocaTree.MocaTreeFactory;
 import MocaTree.Node;
 import SDMLanguage.expressions.ComparingOperator;
