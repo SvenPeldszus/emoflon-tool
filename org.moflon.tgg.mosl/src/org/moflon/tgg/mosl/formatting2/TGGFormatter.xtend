@@ -32,8 +32,12 @@ import org.moflon.tgg.mosl.tgg.Using
 
 import static org.moflon.tgg.mosl.tgg.TggPackage.Literals.*
 import java.util.List
+import org.moflon.tgg.mosl.services.TGGGrammarAccess
+import com.google.inject.Inject
 
 class TGGFormatter extends AbstractFormatter2 {
+
+	@Inject extension TGGGrammarAccess
 
     val schemaKW 	= "#schema"
     val sourceKW 	= "#source"
@@ -47,8 +51,6 @@ class TGGFormatter extends AbstractFormatter2 {
     val syncKW 		= "#sync:"
     val genKW 		= "#gen:"
     val arrowKW		= "->"
-
-	//@Inject extension TGGGrammarAccess
 
 // predefined Styles
 	def private void lineSeparator(List<? extends EObject> items, extension IFormattableDocument document){

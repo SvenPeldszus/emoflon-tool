@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: MOSL TGG Ide
+Bundle-SymbolicName: org.moflon.tgg.mosl.ide
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: org.moflon.tgg.mosl.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: org.moflon.tgg.mosl.ide.contentassist.antlr.internal,
+ org.moflon.tgg.mosl.ide.contentassist.antlr
+Require-Bundle: org.antlr.runtime;bundle-version="[3.2.0,3.2.1)",
+ com.google.inject,
+ org.eclipse.xtext.ide,
+ org.moflon.tgg.mosl

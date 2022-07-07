@@ -15,8 +15,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -49,7 +47,7 @@ public class NewTGGRuleProjectInfoPage extends WizardPage {
 
 	public NewTGGRuleProjectInfoPage() {
 		super("New TGG rule");
-		ruleName = "";
+		this.ruleName = "";
 		setProjectAndRuleLocation();
 		setSchema();
 
@@ -61,25 +59,25 @@ public class NewTGGRuleProjectInfoPage extends WizardPage {
 	}
 
 	private void setProjectAndRuleLocation() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		ISelection selection = window.getSelectionService().getSelection("org.eclipse.jdt.ui.PackageExplorer");
+		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final ISelection selection = window.getSelectionService().getSelection("org.eclipse.jdt.ui.PackageExplorer");
 		if (selection instanceof ITreeSelection) {
-			ITreeSelection structuredSelection = (ITreeSelection) selection;
-			Object elt = structuredSelection.getFirstElement();
-			ruleLocation = determineLocationForNewRuleInProject(elt);
-			project = ruleLocation.map(l -> l.getProject());
+			final ITreeSelection structuredSelection = (ITreeSelection) selection;
+			final Object elt = structuredSelection.getFirstElement();
+			this.ruleLocation = determineLocationForNewRuleInProject(elt);
+			this.project = this.ruleLocation.map(IResource::getProject);
 		}
 	}
 
 	private void setSchema() {
-		schema = project.map(p -> p.getName());
+		this.schema = this.project.map(IProject::getName);
 	}
 
 	@Override
 	public void createControl(final Composite parent) {
 		// Create root container
-		Composite container = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
+		final Composite container = new Composite(parent, SWT.NULL);
+		final GridLayout layout = new GridLayout();
 		container.setLayout(layout);
 		layout.numColumns = 3;
 
@@ -88,7 +86,7 @@ public class NewTGGRuleProjectInfoPage extends WizardPage {
 		createControlsForSchemaLocation(container);
 
 		// Place cursor in textfield
-		ruleNameTextfield.setFocus();
+		this.ruleNameTextfield.setFocus();
 
 		// Set controls and update
 		setControl(container);
@@ -96,50 +94,44 @@ public class NewTGGRuleProjectInfoPage extends WizardPage {
 	}
 
 	public void createControlsForSchemaLocation(final Composite container) {
-		schemaLocationLabel = createLabel(container);
-		schemaLocationLabel.setText("&Schema:");
-		schemaLocationTextfield = new Text(container, SWT.BORDER | SWT.SINGLE);
-		schema.ifPresent(s -> schemaLocationTextfield.setText(s));
+		this.schemaLocationLabel = createLabel(container);
+		this.schemaLocationLabel.setText("&Schema:");
+		this.schemaLocationTextfield = new Text(container, SWT.BORDER | SWT.SINGLE);
+		this.schema.ifPresent(s -> this.schemaLocationTextfield.setText(s));
 
-		GridData gd2 = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData gd2 = new GridData(GridData.FILL_HORIZONTAL);
 		gd2.horizontalSpan = 2;
-		schemaLocationTextfield.setLayoutData(gd2);
-		schemaLocationTextfield.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				final String text = schemaLocationTextfield.getText();
-				if (text.isEmpty() || text.equals("")) {
-					setErrorMessage("Schema location must not be empty");
-					schema = Optional.empty();
-				} else {
-					schema = Optional.of(text);
-				}
-
-				dialogChanged();
+		this.schemaLocationTextfield.setLayoutData(gd2);
+		this.schemaLocationTextfield.addModifyListener(e -> {
+			final String text = NewTGGRuleProjectInfoPage.this.schemaLocationTextfield.getText();
+			if (text.isEmpty() || text.equals("")) {
+				setErrorMessage("Schema location must not be empty");
+				NewTGGRuleProjectInfoPage.this.schema = Optional.empty();
+			} else {
+				NewTGGRuleProjectInfoPage.this.schema = Optional.of(text);
 			}
+
+			dialogChanged();
 		});
 	}
 
 	public void createControlsForRuleName(final Composite container) {
 		// Create control for entering project name
-		Label label = createLabel(container);
+		final Label label = createLabel(container);
 		label.setText("&Rule name:");
 
-		ruleNameTextfield = new Text(container, SWT.BORDER | SWT.SINGLE);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		this.ruleNameTextfield = new Text(container, SWT.BORDER | SWT.SINGLE);
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
-		ruleNameTextfield.setLayoutData(gd);
-		ruleNameTextfield.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				ruleName = ruleNameTextfield.getText();
+		this.ruleNameTextfield.setLayoutData(gd);
+		this.ruleNameTextfield.addModifyListener(e -> {
+			NewTGGRuleProjectInfoPage.this.ruleName = NewTGGRuleProjectInfoPage.this.ruleNameTextfield.getText();
 
-				if (ruleName.isEmpty()) {
-					setErrorMessage("Rule name must not be empty.");
-				}
-
-				dialogChanged();
+			if (NewTGGRuleProjectInfoPage.this.ruleName.isEmpty()) {
+				setErrorMessage("Rule name must not be empty.");
 			}
+
+			dialogChanged();
 		});
 	}
 
@@ -154,37 +146,39 @@ public class NewTGGRuleProjectInfoPage extends WizardPage {
 
 	@Override
 	public boolean canFlipToNextPage() {
-		return super.canFlipToNextPage() && getErrorMessage() == null;
+		return super.canFlipToNextPage() && (getErrorMessage() == null);
 	}
 
 	public String getRuleName() {
-		return ruleName;
+		return this.ruleName;
 	}
 
 	public IResource getRuleLocation() {
-		return ruleLocation.get();
+		return this.ruleLocation.get();
 	}
 
-	private Optional<IResource> determineLocationForNewRuleInProject(Object selectedElement) {
+	private Optional<IResource> determineLocationForNewRuleInProject(final Object selectedElement) {
 		if (selectedElement instanceof IJavaElement) {
 			try {
 				return Optional.of(((IJavaElement) selectedElement).getCorrespondingResource());
-			} catch (JavaModelException e) {
+			} catch (final JavaModelException e) {
 				LogUtils.error(logger, e);
 			}
 		}
 
-		if (selectedElement instanceof IFile)
+		if (selectedElement instanceof IFile) {
 			return Optional.of(((IFile) selectedElement).getParent());
+		}
 
-		if (selectedElement instanceof IFolder)
+		if (selectedElement instanceof IFolder) {
 			return Optional.of((IFolder) selectedElement);
+		}
 
 		return Optional.empty();
 	}
 
 	public String getSchema() {
-		return schema.get();
+		return this.schema.get();
 	}
 
 	private final void updateStatus(final String message) {
@@ -193,20 +187,23 @@ public class NewTGGRuleProjectInfoPage extends WizardPage {
 	}
 
 	private void dialogChanged() {
-		IStatus validity = validate();
+		final IStatus validity = validate();
 
-		if (validity.isOK())
+		if (validity.isOK()) {
 			updateStatus(null);
-		else
+		} else {
 			updateStatus(validity.getMessage());
+		}
 	}
 
 	private IStatus validate() {
-		if (ruleName.isEmpty())
+		if (this.ruleName.isEmpty()) {
 			return new Status(IStatus.ERROR, TGGActivator.ORG_MOFLON_TGG_MOSL_TGG, "Rule name must not be empty!");
+		}
 
-		if (!schema.isPresent())
+		if (!this.schema.isPresent()) {
 			return new Status(IStatus.ERROR, TGGActivator.ORG_MOFLON_TGG_MOSL_TGG, "Schema name must not be empty!");
+		}
 
 		return new Status(IStatus.OK, TGGActivator.ORG_MOFLON_TGG_MOSL_TGG, "Rule is valid");
 	}
