@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Emf
+Bundle-SymbolicName: org.gervarro.democles.emf
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.gervarro.democles.constraint.emf,
+ org.gervarro.democles.emf.util
+Require-Bundle: org.eclipse.emf.ecore,
+ org.gervarro.democles.common,
+ org.eclipse.emf.ecore.xmi
+Automatic-Module-Name: org.gervarro.democles.emf
+Bundle-RequiredExecutionEnvironment: JavaSE-17

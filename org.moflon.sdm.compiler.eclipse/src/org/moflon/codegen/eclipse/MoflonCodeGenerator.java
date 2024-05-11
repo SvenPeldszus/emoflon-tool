@@ -6,17 +6,15 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.JobGroup;
+import org.eclipse.emf.codegen.ecore.generator.GeneratorAdapterFactory.Descriptor;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.common.util.BasicMonitor;
 import org.eclipse.emf.ecore.EPackage;
@@ -26,6 +24,7 @@ import org.gervarro.eclipse.task.ITask;
 import org.moflon.codegen.MethodBodyHandler;
 import org.moflon.core.preferences.EMoflonPreferencesStorage;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainer;
+import org.moflon.core.propertycontainer.SDMCodeGeneratorIds;
 import org.moflon.core.utilities.WorkspaceHelper;
 import org.moflon.emf.build.GenericMoflonProcess;
 import org.moflon.emf.build.MonitoredGenModelBuilder;
@@ -66,13 +65,13 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			final String fullProjectName = getFullProjectName(moflonProperties);
 			logger.info("Generating code for: " + fullProjectName);
 
-			long toc = System.nanoTime();
+			final long toc = System.nanoTime();
 
 			final Resource resource = getEcoreResource();
 			final EPackage ePackage = (EPackage) resource.getContents().get(0);
 
 			// (1) Instantiate code generation engine
-			final String engineID = "org.moflon.compiler.sdm.democles.reversenavigation.ReverseNavigationCodeGeneratorConfig";
+			final String engineID = SDMCodeGeneratorIds.DEMOCLES_REVERSE_NAVI.getLiteral();
 			final MethodBodyHandler methodBodyHandler = (MethodBodyHandler) Platform.getAdapterManager()
 					.loadAdapter(this, engineID);
 			subMon.worked(5);
@@ -85,41 +84,23 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			}
 
 			// (2.1) Validate SDMs
+			subMon.subTask("Validate SDMs of " + fullProjectName);
 			final ITask validator = methodBodyHandler.createValidator(ePackage);
-			final StatusHolder validationStatusHolder = new StatusHolder();
-			final WorkspaceJob validationJob = new WorkspaceJob(engineID) {
-				@Override
-				public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-					final SubMonitor subMon = SubMonitor.convert(monitor, "Validation job", 100);
-					try {
-						validationStatusHolder.status = validator.run(subMon.split(100));
-					} catch (final Exception e) {
-						validationStatusHolder.status = new Status(IStatus.ERROR,
-								WorkspaceHelper.getPluginId(MoflonCodeGenerator.class),
-								String.format("%s occurred during validation with message %s",
-										e.getClass().getSimpleName(), e.getMessage()));
-					}
-					return validationStatusHolder.status;
-				}
-			};
-			final JobGroup jobGroup = new JobGroup("Validation job group", 1, 1);
-			validationJob.setJobGroup(jobGroup);
-			validationJob.schedule();
-			EMoflonPreferencesStorage preferencesStorage = getPreferencesStorage();
-			final int timeoutForValidationTaskInMillis = preferencesStorage.getInt(EMoflonPreferencesStorage.KEY_VALIDATION_TIMEOUT);
-			jobGroup.join(timeoutForValidationTaskInMillis, subMon.split(10));
-
-			if (validationJob.getResult() == null) {
-				throw new OperationCanceledException(String.format(
-						"Validation took longer than %ds. This could(!) mean that some of your patterns have no valid search plan. You may increase the timeout value using the eMoflon property page",
-						(timeoutForValidationTaskInMillis / 1000)));
+			IStatus validationStatus;
+			try {
+				validationStatus = validator.run(SubMonitor.convert(monitor, "Validation job", 100).split(100));
+			} catch (final Exception e) {
+				validationStatus = new Status(IStatus.ERROR,
+						WorkspaceHelper.getPluginId(MoflonCodeGenerator.class),
+						String.format("%s occurred during validation with message %s",
+								e.getClass().getSimpleName(), e.getMessage()));
 			}
+
 
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
 
-			final IStatus validationStatus = validationStatusHolder.status;
 			if (validationStatus.matches(IStatus.ERROR)) {
 				return validationStatus;
 			}
@@ -143,8 +124,9 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			}
 
 			// (3) Build or load GenModel
+			subMon.subTask("Building GenModel for " + fullProjectName);
 			final MonitoredGenModelBuilder genModelBuilderJob = new MonitoredGenModelBuilder(getResourceSet(),
-					getAllResources(), getEcoreFile(), true, getMoflonProperties());
+					getAllResources(), getEcoreFile(), false, getMoflonProperties());
 			final IStatus genModelBuilderStatus = genModelBuilderJob.run(subMon.split(15));
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
@@ -157,7 +139,7 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			// (4) Load injections
 			final IProject project = getEcoreFile().getProject();
 
-			final IStatus injectionStatus = createInjections(project, genModel);
+			final IStatus injectionStatus = createInjections(project, this.genModel);
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
@@ -178,10 +160,9 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 
 			// (6) Generate code
 			subMon.subTask("Generating code for project " + project.getName());
-//			final Descriptor codeGenerationEngine = methodBodyHandler.createCodeGenerationEngine(this, resource);
-//			final CodeGenerator codeGenerator = new CodeGenerator(codeGenerationEngine);
-			final CodeGenerator codeGenerator = new CodeGenerator();
-			final IStatus codeGenerationStatus = codeGenerator.generateCode(genModel,
+			final Descriptor codeGenerationEngine = methodBodyHandler.createCodeGenerationEngine(this, resource);
+			final CodeGenerator codeGenerator = new CodeGenerator(codeGenerationEngine);
+			final IStatus codeGenerationStatus = codeGenerator.generateCode(this.genModel,
 					new BasicMonitor.EclipseSubProgress(subMon, 30));
 			if (subMon.isCanceled()) {
 				return Status.CANCEL_STATUS;
@@ -191,16 +172,16 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 			}
 			subMon.worked(5);
 
-			long tic = System.nanoTime();
+			final long tic = System.nanoTime();
 
 			logger.info(String.format(Locale.US, "Completed in %.3fs", (tic - toc) / 1e9));
 
 			final boolean everythingOK = validationStatus.isOK() && injectionStatus.isOK() && weaverStatus.isOK();
 			return everythingOK
 					? new Status(IStatus.OK, WorkspaceHelper.getPluginId(getClass()), "Code generation succeeded")
-					: new MultiStatus(WorkspaceHelper.getPluginId(getClass()), validationStatus.getCode(),
-							new IStatus[] { validationStatus, weaverStatus, injectionStatus },
-							"Code generation warnings/errors", null);
+							: new MultiStatus(WorkspaceHelper.getPluginId(getClass()), validationStatus.getCode(),
+									new IStatus[] { validationStatus, weaverStatus, injectionStatus },
+									"Code generation warnings/errors", null);
 		} catch (final Exception e) {
 			return new Status(IStatus.ERROR, WorkspaceHelper.getPluginId(getClass()), IStatus.ERROR,
 					String.format("%s occurred during eMoflon code generation. Message: '%s'. Stacktrace:\n%s",
@@ -210,11 +191,11 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 	}
 
 	public final GenModel getGenModel() {
-		return genModel;
+		return this.genModel;
 	}
 
 	public final InjectionManager getInjectorManager() {
-		return injectionManager;
+		return this.injectionManager;
 	}
 
 	protected String getFullProjectName(final MoflonPropertiesContainer moflonProperties) {
@@ -225,16 +206,16 @@ public class MoflonCodeGenerator extends GenericMoflonProcess {
 	 * Loads the injections from the /injection folder
 	 */
 	private IStatus createInjections(final IProject project, final GenModel genModel) throws CoreException {
-		IFolder injectionFolder = WorkspaceHelper.addFolder(project, WorkspaceHelper.INJECTION_FOLDER,
+		final IFolder injectionFolder = WorkspaceHelper.addFolder(project, WorkspaceHelper.INJECTION_FOLDER,
 				new NullProgressMonitor());
-		CodeInjector injector = new CodeInjectorImpl(project.getLocation().toOSString());
+		final CodeInjector injector = new CodeInjectorImpl(project.getLocation().toOSString());
 
-		InjectionExtractor injectionExtractor = new XTextInjectionExtractor(injectionFolder, genModel);
-		CompilerInjectionExtractorImpl compilerInjectionExtractor = new CompilerInjectionExtractorImpl(project,
+		final InjectionExtractor injectionExtractor = new XTextInjectionExtractor(injectionFolder, genModel);
+		final CompilerInjectionExtractorImpl compilerInjectionExtractor = new CompilerInjectionExtractorImpl(project,
 				genModel);
 
-		injectionManager = new InjectionManager(injectionExtractor, compilerInjectionExtractor, injector);
-		return injectionManager.extractInjections();
+		this.injectionManager = new InjectionManager(injectionExtractor, compilerInjectionExtractor, injector);
+		return this.injectionManager.extractInjections();
 	}
 
 	private static class StatusHolder {

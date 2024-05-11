@@ -5,7 +5,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.gervarro.democles.codegen.Chain;
 import org.gervarro.democles.codegen.GeneratorOperation;
 import org.gervarro.democles.common.Adornment;
-import org.gervarro.democles.compiler.CompilerPattern;
 import org.gervarro.democles.compiler.CompilerPatternBody;
 import org.gervarro.democles.specification.emf.Pattern;
 import org.moflon.compiler.sdm.democles.eclipse.AdapterResource;
@@ -13,7 +12,6 @@ import org.moflon.core.preferences.EMoflonPreferencesStorage;
 import org.moflon.democles.reachability.javabdd.BDDReachabilityAnalyzer;
 import org.moflon.democles.reachability.javabdd.NullReachabilityAnalyzer;
 import org.moflon.democles.reachability.javabdd.ReachabilityAnalyzer;
-import org.moflon.sdm.compiler.democles.validation.result.ErrorMessage;
 import org.moflon.sdm.compiler.democles.validation.result.ResultFactory;
 import org.moflon.sdm.compiler.democles.validation.result.Severity;
 import org.moflon.sdm.compiler.democles.validation.result.ValidationReport;
@@ -36,7 +34,7 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 	/**
 	 * Configures which search plan generator to use
 	 * ({@link PatternMatcherCompiler}) and which pattern type is supported
-	 * 
+	 *
 	 * @param patternMatcher
 	 *            the search plan generator to use
 	 * @param patternType
@@ -53,7 +51,7 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 	/**
 	 * This method generates a search plan for the given pattern invocations
 	 * (consisting of a {@link Pattern} and an input {@link Adornment})
-	 * 
+	 *
 	 * @param pattern
 	 *            the pattern of the pattern invocation
 	 * @param adornment
@@ -67,25 +65,25 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 	@Override
 	public ValidationReport generateSearchPlan(final Pattern pattern, final Adornment adornment,
 			final boolean isMultipleMatch) {
-		final ValidationReport report = ResultFactory.eINSTANCE.createValidationReport();
+		final var report = ResultFactory.eINSTANCE.createValidationReport();
 		Logger.getLogger(getClass()).debug("Generating search plan for " + pattern);
 		try {
-			final EClass eClass = (EClass) ((AdapterResource) pattern.eResource()).getTarget();
-			final CompilerPattern compilerPattern = patternMatcher.compilePattern(pattern, adornment);
-			final CompilerPatternBody body = compilerPattern.getBodies().get(0);
+			final var eClass = (EClass) ((AdapterResource) pattern.eResource()).getTarget();
+			final var compilerPattern = this.patternMatcher.compilePattern(pattern, adornment);
+			final var body = compilerPattern.getBodies().get(0);
 			final ReachabilityAnalyzer reachabilityAnalyzer;
-			if (preferencesStorage.getBoolean(EMoflonPreferencesStorage.KEY_REACHABILITY_ENABLED)) {
-				final int maximumAdornmentSize = preferencesStorage.getInt(EMoflonPreferencesStorage.KEY_REACHABILITY_MAX_ADORNMENT_SIZE);
+			if (this.preferencesStorage.getBoolean(EMoflonPreferencesStorage.KEY_REACHABILITY_ENABLED)) {
+				final int maximumAdornmentSize = this.preferencesStorage.getInt(EMoflonPreferencesStorage.KEY_REACHABILITY_MAX_ADORNMENT_SIZE);
 				reachabilityAnalyzer = maximumAdornmentSize == EMoflonPreferencesStorage.REACHABILITY_MAX_ADORNMENT_SIZE_INFINITY //
 						? new BDDReachabilityAnalyzer() //
-						: new BDDReachabilityAnalyzer(maximumAdornmentSize);
+								: new BDDReachabilityAnalyzer(maximumAdornmentSize);
 			} else {
 				reachabilityAnalyzer = new NullReachabilityAnalyzer();
 			}
-			final boolean isReachable = reachabilityAnalyzer.analyzeReachability(compilerPattern, adornment);
+			final var isReachable = reachabilityAnalyzer.analyzeReachability(compilerPattern, adornment);
 			if (isReachable) {
-				final Chain<GeneratorOperation> searchPlan = PatternMatcherCompiler.generateSearchPlan(body, adornment);
-				final SearchPlanAdapter adapter = createSearchPlanAdapter(body, adornment, searchPlan, isMultipleMatch);
+				final var searchPlan = PatternMatcherCompiler.generateSearchPlan(body, adornment);
+				final var adapter = createSearchPlanAdapter(body, adornment, searchPlan, isMultipleMatch);
 				eClass.eAdapters().add(adapter);
 			} else {
 				createAndAddErrorMessage(pattern, report, "Reachability analysis was negative.");
@@ -98,7 +96,7 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 
 	/**
 	 * Search plan adapter generation strategy to be implemented by subclasses.
-	 * 
+	 *
 	 * @param body
 	 *            the body of the processed {@link Pattern}
 	 * @param adornment
@@ -117,7 +115,7 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 	/**
 	 * Creates a 'no search plan found' error for the given {@link Pattern} and
 	 * attaches it to the {@link ValidationReport}.
-	 * 
+	 *
 	 * @param pattern
 	 *            the pattern
 	 * @param report
@@ -126,7 +124,7 @@ public abstract class PatternMatcherGenerator extends PatternMatcherImpl {
 	 *            details about the error message
 	 */
 	static void createAndAddErrorMessage(final Pattern pattern, final ValidationReport report, final String details) {
-		final ErrorMessage error = ResultFactory.eINSTANCE.createErrorMessage();
+		final var error = ResultFactory.eINSTANCE.createErrorMessage();
 		report.getErrorMessages().add(error);
 		error.setId(String.format(
 				"No search plan found for pattern '%s'. Please ensure that your patterns are not disjunct. Details: '%s'.",

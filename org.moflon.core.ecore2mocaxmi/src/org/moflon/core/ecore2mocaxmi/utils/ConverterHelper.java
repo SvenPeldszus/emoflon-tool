@@ -21,6 +21,7 @@ import org.moflon.core.ecore2mocaxmi.Ecore2mocaxmiFactory;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainerHelper;
 import org.moflon.core.utilities.WorkspaceHelper;
 import org.moflon.emf.build.MonitoredMetamodelLoader;
+
 import MocaTree.Node;
 
 public class ConverterHelper {

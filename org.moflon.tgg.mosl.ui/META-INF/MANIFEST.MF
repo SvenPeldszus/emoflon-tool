@@ -8,34 +8,26 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext.ui,
  org.eclipse.xtext.ui.shared,
  org.eclipse.xtext.ui.codetemplates.ui,
- org.eclipse.ui.editors;bundle-version="3.5.0",
- org.eclipse.ui.ide;bundle-version="3.5.0",
- org.eclipse.ui,
  org.eclipse.compare,
  org.eclipse.xtext.builder,
  org.moflon.core.ui,
  org.moflon.core.utilities,
  org.moflon.ide.core,
- org.moflon.ide.visualization.dot.language,
- org.moflon.tgg.language,
- net.sourceforge.plantuml.eclipse,
- org.moflon.ide.visualization.dot.tgg,
  org.moflon.core.plugins,
- org.moflon.ide.visualization.dot.tgg.schema,
- SDMLanguage,
- MocaTree,
  org.moflon.core.build,
- org.moflon.emf.ui,
  org.moflon.tgg.mosl.codeadapter,
- org.emoflon.core.dependencies,
  org.moflon.tgg.mosl,
  org.moflon.tgg.mosl.ui,
  org.eclipse.jdt.ui,
- org.moflon.tgg.mosl.ide
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+ org.moflon.tgg.mosl.ide,
+ org.moflon.emf.ui,
+ org.eclipse.jdt.core,
+ org.gervarro.eclipse.workspace.util
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Export-Package: org.moflon.tgg.mosl.ui.contentassist,
  org.moflon.tgg.mosl.ui.internal,
  org.moflon.tgg.mosl.ui.quickfix
-Bundle-Activator: org.moflon.tgg.mosl.ui.internal.TGGActivator
+Bundle-Activator: org.moflon.tgg.mosl.ui.internal.MoslActivator
 Import-Package: org.apache.log4j
 Automatic-Module-Name: org.moflon.tgg.mosl.ui
+Bundle-ClassPath: .

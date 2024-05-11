@@ -17,7 +17,6 @@ import org.gervarro.democles.compiler.CompilerPatternBuilder;
 import org.gervarro.democles.constraint.CoreConstraintModule;
 import org.gervarro.democles.constraint.emf.EMFConstraintModule;
 import org.gervarro.democles.emf.EMFWeightedOperationBuilder;
-import org.gervarro.democles.plan.WeightedOperationBuilder;
 import org.gervarro.democles.plan.common.DefaultAlgorithm;
 import org.gervarro.democles.relational.RelationalOperationBuilder;
 import org.gervarro.democles.specification.emf.EMFPatternBuilder;
@@ -29,48 +28,29 @@ import org.gervarro.democles.specification.impl.DefaultPatternBody;
 import org.gervarro.democles.specification.impl.DefaultPatternFactory;
 import org.gervarro.democles.specification.impl.PatternInvocationConstraintModule;
 import org.moflon.core.preferences.EMoflonPreferencesStorage;
-import org.moflon.sdm.compiler.democles.pattern.BindingPatternTransformer;
-import org.moflon.sdm.compiler.democles.pattern.BlackAndNacPatternTransformer;
-import org.moflon.sdm.compiler.democles.pattern.DefaultExpressionTransformer;
-import org.moflon.sdm.compiler.democles.pattern.GreenPatternTransformer;
-import org.moflon.sdm.compiler.democles.pattern.LiteralExpressionTransformer;
-import org.moflon.sdm.compiler.democles.pattern.NacPatternTransformer;
 import org.moflon.sdm.compiler.democles.pattern.PatternFactory;
-import org.moflon.sdm.compiler.democles.pattern.PatternTransformer;
-import org.moflon.sdm.compiler.democles.pattern.RedPatternTransformer;
-import org.moflon.sdm.compiler.democles.validation.scope.BindingAndBlackPatternBuilder;
-import org.moflon.sdm.compiler.democles.validation.scope.BindingExpressionBuilder;
-import org.moflon.sdm.compiler.democles.validation.scope.BlackPatternBuilder;
-import org.moflon.sdm.compiler.democles.validation.scope.ExpressionExplorer;
-import org.moflon.sdm.compiler.democles.validation.scope.GreenPatternBuilder;
-import org.moflon.sdm.compiler.democles.validation.scope.NacPatternBuilder;
 import org.moflon.sdm.compiler.democles.validation.scope.PatternMatcher;
-import org.moflon.sdm.compiler.democles.validation.scope.RedNodeDeletionBuilder;
-import org.moflon.sdm.compiler.democles.validation.scope.RedPatternBuilder;
 import org.moflon.sdm.compiler.democles.validation.scope.ScopeFactory;
 import org.moflon.sdm.compiler.democles.validation.scope.ScopeValidator;
-import org.moflon.sdm.compiler.democles.validation.scope.SingleResultPatternInvocationBuilder;
-import org.moflon.sdm.compiler.democles.validation.scope.StoryNodeActionBuilder;
-import org.moflon.sdm.democles.literalexpressionsolver.ConstantTransformer;
 import org.moflon.sdm.democles.literalexpressionsolver.LiteralexpressionsolverFactory;
 
 public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 	protected final ResourceSet resourceSet;
 
-	private final WeightedOperationBuilder<GeneratorOperation> builder = new EMFWeightedOperationBuilder<GeneratorOperation>();
-	private final DefaultAlgorithm<SimpleCombiner, GeneratorOperation> algorithm = new DefaultAlgorithm<SimpleCombiner, GeneratorOperation>(
-			builder);
+	private final EMFWeightedOperationBuilder<GeneratorOperation> builder = new EMFWeightedOperationBuilder<>();
+	private final DefaultAlgorithm<SimpleCombiner, GeneratorOperation> algorithm = new DefaultAlgorithm<>(
+			this.builder);
 
 	// Constraint modules
 	final EMFConstraintModule emfTypeModule;
 	final EMFTypeModule internalEMFTypeModule;
 	final RelationalTypeModule internalRelationalTypeModule = new RelationalTypeModule(CoreConstraintModule.INSTANCE);
-	protected final EMFPatternBuilder<DefaultPattern, DefaultPatternBody> bindingAndBlackPatternBuilder = new EMFPatternBuilder<DefaultPattern, DefaultPatternBody>(
+	protected final EMFPatternBuilder<DefaultPattern, DefaultPatternBody> bindingAndBlackPatternBuilder = new EMFPatternBuilder<>(
 			new DefaultPatternFactory());
 	final PatternInvocationConstraintModule<DefaultPattern, DefaultPatternBody> bindingAndBlackPatternInvocationTypeModule = new PatternInvocationConstraintModule<DefaultPattern, DefaultPatternBody>(
-			bindingAndBlackPatternBuilder);
-	final PatternInvocationTypeModule<DefaultPattern, DefaultPatternBody> internalPatternInvocationTypeModule = new PatternInvocationTypeModule<DefaultPattern, DefaultPatternBody>(
-			bindingAndBlackPatternInvocationTypeModule);
+			this.bindingAndBlackPatternBuilder);
+	final PatternInvocationTypeModule<DefaultPattern, DefaultPatternBody> internalPatternInvocationTypeModule = new PatternInvocationTypeModule<>(
+			this.bindingAndBlackPatternInvocationTypeModule);
 
 	// Operation modules (constraint to operation (constraint + adornment) mappings)
 	protected final RelationalOperationBuilder relationalOperationBuilder = new RelationalOperationBuilder();
@@ -95,18 +75,18 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 
 	private final EMoflonPreferencesStorage preferencesStorage;
 
-	public DefaultValidatorConfig(final ResourceSet resourceSet, EMoflonPreferencesStorage preferencesStorage) {
+	public DefaultValidatorConfig(final ResourceSet resourceSet, final EMoflonPreferencesStorage preferencesStorage) {
 		this.resourceSet = resourceSet;
 		this.preferencesStorage = preferencesStorage;
 
 		this.emfTypeModule = new EMFConstraintModule(this.resourceSet);
-		this.internalEMFTypeModule = new EMFTypeModule(emfTypeModule);
+		this.internalEMFTypeModule = new EMFTypeModule(this.emfTypeModule);
 		this.bindingAndBlackPatternBuilder
-				.addConstraintTypeSwitch(internalPatternInvocationTypeModule.getConstraintTypeSwitch());
+		.addConstraintTypeSwitch(this.internalPatternInvocationTypeModule.getConstraintTypeSwitch());
 		this.bindingAndBlackPatternBuilder
-				.addConstraintTypeSwitch(internalRelationalTypeModule.getConstraintTypeSwitch());
-		this.bindingAndBlackPatternBuilder.addConstraintTypeSwitch(internalEMFTypeModule.getConstraintTypeSwitch());
-		this.bindingAndBlackPatternBuilder.addVariableTypeSwitch(internalEMFTypeModule.getVariableTypeSwitch());
+		.addConstraintTypeSwitch(this.internalRelationalTypeModule.getConstraintTypeSwitch());
+		this.bindingAndBlackPatternBuilder.addConstraintTypeSwitch(this.internalEMFTypeModule.getConstraintTypeSwitch());
+		this.bindingAndBlackPatternBuilder.addVariableTypeSwitch(this.internalEMFTypeModule.getVariableTypeSwitch());
 	}
 
 	@Override
@@ -127,53 +107,53 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 	@Override
 	public ScopeValidator createScopeValidator() {
 		final Resource resource = new ResourceImpl(URI.createURI("ScopeValidator"));
-		resourceSet.getResources().add(resource);
-		final ScopeValidator scopeValidator = ScopeFactory.eINSTANCE.createScopeValidator();
+		this.resourceSet.getResources().add(resource);
+		final var scopeValidator = ScopeFactory.eINSTANCE.createScopeValidator();
 		resource.getContents().add(scopeValidator);
 
 		try {
 			final Resource expressionTransformerResource = new ResourceImpl(URI.createURI("ExpressionHandler"));
-			resourceSet.getResources().add(expressionTransformerResource);
-			final ConstantTransformer constantTransformer = LiteralexpressionsolverFactory.eINSTANCE
+			this.resourceSet.getResources().add(expressionTransformerResource);
+			final var constantTransformer = LiteralexpressionsolverFactory.eINSTANCE
 					.createConstantTransformer();
 			expressionTransformerResource.getContents().add(constantTransformer);
-			final LiteralExpressionTransformer literalExpressionTransformer = PatternFactory.eINSTANCE
+			final var literalExpressionTransformer = PatternFactory.eINSTANCE
 					.createLiteralExpressionTransformer();
 			expressionTransformerResource.getContents().add(literalExpressionTransformer);
 			literalExpressionTransformer.setConstantTransformer(constantTransformer);
-			final DefaultExpressionTransformer expressionTransformer = PatternFactory.eINSTANCE
+			final var expressionTransformer = PatternFactory.eINSTANCE
 					.createDefaultExpressionTransformer();
 			expressionTransformerResource.getContents().add(expressionTransformer);
 			expressionTransformer.setDelegate(literalExpressionTransformer);
-			final ExpressionExplorer expressionExplorer = ScopeFactory.eINSTANCE.createExpressionExplorer();
+			final var expressionExplorer = ScopeFactory.eINSTANCE.createExpressionExplorer();
 			expressionTransformerResource.getContents().add(expressionExplorer);
 			expressionExplorer.setExpressionTransformer(expressionTransformer);
 
-			this.setBindingAndBlackPatternMatcher(configureBindingAndBlackPatternMatcher(resource));
-			this.setBindingPatternMatcher(configureBindingPatternMatcher(resource));
-			this.setBlackPatternMatcher(configureBlackPatternMatcher(resource));
-			this.setRedPatternMatcher(configureRedPatternMatcher(resource));
-			this.setGreenPatternMatcher(configureGreenPatternMatcher(resource));
-			this.setExpressionPatternMatcher(configureExpressionPatternMatcher(resource));
+			setBindingAndBlackPatternMatcher(configureBindingAndBlackPatternMatcher(resource));
+			setBindingPatternMatcher(configureBindingPatternMatcher(resource));
+			setBlackPatternMatcher(configureBlackPatternMatcher(resource));
+			setRedPatternMatcher(configureRedPatternMatcher(resource));
+			setGreenPatternMatcher(configureGreenPatternMatcher(resource));
+			setExpressionPatternMatcher(configureExpressionPatternMatcher(resource));
 
 			// (1) Handler for regular story nodes
-			final StoryNodeActionBuilder regularStoryNodeActionBuilder = ScopeFactory.eINSTANCE
+			final var regularStoryNodeActionBuilder = ScopeFactory.eINSTANCE
 					.createStoryNodeActionBuilder();
 			scopeValidator.getActionBuilders().add(regularStoryNodeActionBuilder);
 			regularStoryNodeActionBuilder.setRequiresForEach(false);
 
-			final BindingAndBlackPatternBuilder regularBindingAndBlackInvocationBuilder = ScopeFactory.eINSTANCE
+			final var regularBindingAndBlackInvocationBuilder = ScopeFactory.eINSTANCE
 					.createBindingAndBlackPatternBuilder();
 			regularStoryNodeActionBuilder.getChildren().add(regularBindingAndBlackInvocationBuilder);
 			regularBindingAndBlackInvocationBuilder
-					.setSuffix(DemoclesMethodBodyHandler.BINDING_AND_BLACK_FILE_EXTENSION);
+			.setSuffix(DemoclesMethodBodyHandler.BINDING_AND_BLACK_FILE_EXTENSION);
 			regularBindingAndBlackInvocationBuilder.setMainActionBuilder(true);
 			regularBindingAndBlackInvocationBuilder.setPatternMatcher(getBindingAndBlackPatternSearchPlanGenerator());
 
-			final BindingExpressionBuilder regularBindingExpressionBuilder = ScopeFactory.eINSTANCE
+			final var regularBindingExpressionBuilder = ScopeFactory.eINSTANCE
 					.createBindingExpressionBuilder();
 			regularBindingAndBlackInvocationBuilder.getChildBuilders().add(regularBindingExpressionBuilder);
-			final BindingPatternTransformer regularBindingPatternTransformer = PatternFactory.eINSTANCE
+			final var regularBindingPatternTransformer = PatternFactory.eINSTANCE
 					.createBindingPatternTransformer();
 			regularBindingExpressionBuilder.setPatternTransformer(regularBindingPatternTransformer);
 			regularBindingExpressionBuilder.setExpressionExplorer(expressionExplorer);
@@ -182,11 +162,11 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			regularBindingExpressionBuilder.setPatternMatcher(getBindingPatternSearchPlanGenerator());
 			regularBindingPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final BlackPatternBuilder regularBlackInvocationBuilder = ScopeFactory.eINSTANCE
+			final var regularBlackInvocationBuilder = ScopeFactory.eINSTANCE
 					.createBlackPatternBuilder();
 			regularBindingAndBlackInvocationBuilder.getChildBuilders().add(regularBlackInvocationBuilder);
 			regularBindingAndBlackInvocationBuilder.setBlackPatternBuilder(regularBlackInvocationBuilder);
-			final BlackAndNacPatternTransformer regularBlackPatternTransformer = PatternFactory.eINSTANCE
+			final var regularBlackPatternTransformer = PatternFactory.eINSTANCE
 					.createBlackAndNacPatternTransformer();
 			regularBlackInvocationBuilder.setPatternTransformer(regularBlackPatternTransformer);
 			regularBlackInvocationBuilder.setExpressionExplorer(expressionExplorer);
@@ -195,9 +175,9 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			regularBlackInvocationBuilder.setPatternMatcher(getBlackPatternSearchPlanGenerator());
 			regularBlackPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final NacPatternBuilder regularNacPatternBuilder = ScopeFactory.eINSTANCE.createNacPatternBuilder();
+			final var regularNacPatternBuilder = ScopeFactory.eINSTANCE.createNacPatternBuilder();
 			regularBlackInvocationBuilder.getChildBuilders().add(regularNacPatternBuilder);
-			final NacPatternTransformer regularNacPatternTransformer = PatternFactory.eINSTANCE
+			final var regularNacPatternTransformer = PatternFactory.eINSTANCE
 					.createNacPatternTransformer();
 			regularNacPatternBuilder.setPatternTransformer(regularNacPatternTransformer);
 			regularNacPatternBuilder.setExpressionExplorer(expressionExplorer);
@@ -205,9 +185,9 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			regularNacPatternBuilder.setPatternMatcher(getBlackPatternSearchPlanGenerator());
 			regularNacPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final RedPatternBuilder regularRedInvocationBuilder = ScopeFactory.eINSTANCE.createRedPatternBuilder();
+			final var regularRedInvocationBuilder = ScopeFactory.eINSTANCE.createRedPatternBuilder();
 			regularStoryNodeActionBuilder.getChildren().add(regularRedInvocationBuilder);
-			final RedPatternTransformer regularRedPatternTransformer = PatternFactory.eINSTANCE
+			final var regularRedPatternTransformer = PatternFactory.eINSTANCE
 					.createRedPatternTransformer();
 			regularRedInvocationBuilder.setPatternTransformer(regularRedPatternTransformer);
 			regularRedInvocationBuilder.setExpressionExplorer(expressionExplorer);
@@ -216,10 +196,10 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			regularRedInvocationBuilder.setPatternMatcher(getRedPatternSearchPlanGenerator());
 			regularRedPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final GreenPatternBuilder regularGreenInvocationBuilder = ScopeFactory.eINSTANCE
+			final var regularGreenInvocationBuilder = ScopeFactory.eINSTANCE
 					.createGreenPatternBuilder();
 			regularStoryNodeActionBuilder.getChildren().add(regularGreenInvocationBuilder);
-			final GreenPatternTransformer regularGreenPatternTransformer = PatternFactory.eINSTANCE
+			final var regularGreenPatternTransformer = PatternFactory.eINSTANCE
 					.createGreenPatternTransformer();
 			regularGreenInvocationBuilder.setPatternTransformer(regularGreenPatternTransformer);
 			regularGreenInvocationBuilder.setExpressionExplorer(expressionExplorer);
@@ -228,20 +208,20 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			regularGreenInvocationBuilder.setPatternMatcher(getGreenPatternSearchPlanGenerator());
 			regularGreenPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final RedNodeDeletionBuilder regularRedNodeDeletionBuilder = ScopeFactory.eINSTANCE
+			final var regularRedNodeDeletionBuilder = ScopeFactory.eINSTANCE
 					.createRedNodeDeletionBuilder();
 			regularStoryNodeActionBuilder.getChildren().add(regularRedNodeDeletionBuilder);
 
 			// (2) Handler for ForEach story nodes
-			final StoryNodeActionBuilder forEachStoryNodeActionBuilder = ScopeFactory.eINSTANCE
+			final var forEachStoryNodeActionBuilder = ScopeFactory.eINSTANCE
 					.createStoryNodeActionBuilder();
 			scopeValidator.getActionBuilders().add(forEachStoryNodeActionBuilder);
 			forEachStoryNodeActionBuilder.setRequiresForEach(true);
 
-			final BindingExpressionBuilder forEachBindingExpressionBuilder = ScopeFactory.eINSTANCE
+			final var forEachBindingExpressionBuilder = ScopeFactory.eINSTANCE
 					.createBindingExpressionBuilder();
 			forEachStoryNodeActionBuilder.getChildren().add(forEachBindingExpressionBuilder);
-			final BindingPatternTransformer forEachBindingPatternTransformer = PatternFactory.eINSTANCE
+			final var forEachBindingPatternTransformer = PatternFactory.eINSTANCE
 					.createBindingPatternTransformer();
 			forEachBindingExpressionBuilder.setPatternTransformer(forEachBindingPatternTransformer);
 			forEachBindingExpressionBuilder.setExpressionExplorer(expressionExplorer);
@@ -250,10 +230,10 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			forEachBindingExpressionBuilder.setPatternMatcher(getBindingPatternSearchPlanGenerator());
 			forEachBindingPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final BlackPatternBuilder forEachBlackInvocationBuilder = ScopeFactory.eINSTANCE
+			final var forEachBlackInvocationBuilder = ScopeFactory.eINSTANCE
 					.createBlackPatternBuilder();
 			forEachStoryNodeActionBuilder.getChildren().add(forEachBlackInvocationBuilder);
-			final BlackAndNacPatternTransformer forEachBlackPatternTransformer = PatternFactory.eINSTANCE
+			final var forEachBlackPatternTransformer = PatternFactory.eINSTANCE
 					.createBlackAndNacPatternTransformer();
 			forEachBlackInvocationBuilder.setPatternTransformer(forEachBlackPatternTransformer);
 			forEachBlackInvocationBuilder.setExpressionExplorer(expressionExplorer);
@@ -262,9 +242,9 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			forEachBlackInvocationBuilder.setPatternMatcher(getBlackPatternSearchPlanGenerator());
 			forEachBlackPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final NacPatternBuilder forEachNacPatternBuilder = ScopeFactory.eINSTANCE.createNacPatternBuilder();
+			final var forEachNacPatternBuilder = ScopeFactory.eINSTANCE.createNacPatternBuilder();
 			forEachBlackInvocationBuilder.getChildBuilders().add(forEachNacPatternBuilder);
-			final NacPatternTransformer forEachNacPatternTransformer = PatternFactory.eINSTANCE
+			final var forEachNacPatternTransformer = PatternFactory.eINSTANCE
 					.createNacPatternTransformer();
 			forEachNacPatternBuilder.setPatternTransformer(forEachNacPatternTransformer);
 			forEachNacPatternBuilder.setExpressionExplorer(expressionExplorer);
@@ -272,9 +252,9 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			forEachNacPatternBuilder.setPatternMatcher(getBlackPatternSearchPlanGenerator());
 			forEachNacPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final RedPatternBuilder forEachRedInvocationBuilder = ScopeFactory.eINSTANCE.createRedPatternBuilder();
+			final var forEachRedInvocationBuilder = ScopeFactory.eINSTANCE.createRedPatternBuilder();
 			forEachStoryNodeActionBuilder.getChildren().add(forEachRedInvocationBuilder);
-			final RedPatternTransformer forEachRedPatternTransformer = PatternFactory.eINSTANCE
+			final var forEachRedPatternTransformer = PatternFactory.eINSTANCE
 					.createRedPatternTransformer();
 			forEachRedInvocationBuilder.setPatternTransformer(forEachRedPatternTransformer);
 			forEachRedInvocationBuilder.setExpressionExplorer(expressionExplorer);
@@ -283,10 +263,10 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			forEachRedInvocationBuilder.setPatternMatcher(getRedPatternSearchPlanGenerator());
 			forEachRedPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final GreenPatternBuilder forEachGreenInvocationBuilder = ScopeFactory.eINSTANCE
+			final var forEachGreenInvocationBuilder = ScopeFactory.eINSTANCE
 					.createGreenPatternBuilder();
 			forEachStoryNodeActionBuilder.getChildren().add(forEachGreenInvocationBuilder);
-			final GreenPatternTransformer forEachGreenPatternTransformer = PatternFactory.eINSTANCE
+			final var forEachGreenPatternTransformer = PatternFactory.eINSTANCE
 					.createGreenPatternTransformer();
 			forEachGreenInvocationBuilder.setPatternTransformer(forEachGreenPatternTransformer);
 			forEachGreenInvocationBuilder.setExpressionExplorer(expressionExplorer);
@@ -295,19 +275,19 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 			forEachGreenInvocationBuilder.setPatternMatcher(getGreenPatternSearchPlanGenerator());
 			forEachGreenPatternTransformer.setExpressionTransformer(expressionTransformer);
 
-			final RedNodeDeletionBuilder forEachRedNodeDeletionBuilder = ScopeFactory.eINSTANCE
+			final var forEachRedNodeDeletionBuilder = ScopeFactory.eINSTANCE
 					.createRedNodeDeletionBuilder();
 			forEachStoryNodeActionBuilder.getChildren().add(forEachRedNodeDeletionBuilder);
 
 			// (3) Handler for statement and stop nodes
-			final SingleResultPatternInvocationBuilder expressionActionBuilder = ScopeFactory.eINSTANCE
+			final var expressionActionBuilder = ScopeFactory.eINSTANCE
 					.createSingleResultPatternInvocationBuilder();
 			scopeValidator.getActionBuilders().add(expressionActionBuilder);
-			final PatternTransformer expressionPatternTransformer = PatternFactory.eINSTANCE.createPatternTransformer();
+			final var expressionPatternTransformer = PatternFactory.eINSTANCE.createPatternTransformer();
 			expressionActionBuilder.setPatternVariableHandler(expressionPatternTransformer);
 			expressionActionBuilder.setExpressionExplorer(expressionExplorer);
 			expressionActionBuilder.setSuffix(DemoclesMethodBodyHandler.EXPRESSION_FILE_EXTENSION);
-			expressionActionBuilder.setPatternMatcher(expressionPatternMatcher);
+			expressionActionBuilder.setPatternMatcher(this.expressionPatternMatcher);
 			expressionPatternTransformer.setExpressionTransformer(expressionTransformer);
 		} catch (final IOException e) {
 			// Do nothing
@@ -320,74 +300,74 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 	}
 
 	protected PatternMatcher getBindingAndBlackPatternSearchPlanGenerator() {
-		return bindingAndBlackPatternMatcher;
+		return this.bindingAndBlackPatternMatcher;
 	}
 
 	protected PatternMatcher getBindingPatternSearchPlanGenerator() {
-		return bindingPatternMatcher;
+		return this.bindingPatternMatcher;
 	}
 
 	protected PatternMatcher getBlackPatternSearchPlanGenerator() {
-		return blackPatternMatcher;
+		return this.blackPatternMatcher;
 	}
 
 	protected PatternMatcher getRedPatternSearchPlanGenerator() {
-		return redPatternMatcher;
+		return this.redPatternMatcher;
 	}
 
 	protected PatternMatcher getGreenPatternSearchPlanGenerator() {
-		return greenPatternMatcher;
+		return this.greenPatternMatcher;
 	}
 
 	protected PatternMatcher getExpressionPatternSearchPlanGenerator() {
-		return expressionPatternMatcher;
+		return this.expressionPatternMatcher;
 	}
 
-	protected void setBindingAndBlackPatternMatcher(PatternMatcher bindingAndBlackPatternMatcher) {
+	protected void setBindingAndBlackPatternMatcher(final PatternMatcher bindingAndBlackPatternMatcher) {
 		this.bindingAndBlackPatternMatcher = bindingAndBlackPatternMatcher;
 	}
 
-	protected void setBindingPatternMatcher(PatternMatcher bindingPatternMatcher) {
+	protected void setBindingPatternMatcher(final PatternMatcher bindingPatternMatcher) {
 		this.bindingPatternMatcher = bindingPatternMatcher;
 	}
 
-	protected void setBlackPatternMatcher(PatternMatcher blackPatternMatcher) {
+	protected void setBlackPatternMatcher(final PatternMatcher blackPatternMatcher) {
 		this.blackPatternMatcher = blackPatternMatcher;
 	}
 
-	protected void setRedPatternMatcher(PatternMatcher redPatternMatcher) {
+	protected void setRedPatternMatcher(final PatternMatcher redPatternMatcher) {
 		this.redPatternMatcher = redPatternMatcher;
 	}
 
-	protected void setGreenPatternMatcher(PatternMatcher greenPatternMatcher) {
+	protected void setGreenPatternMatcher(final PatternMatcher greenPatternMatcher) {
 		this.greenPatternMatcher = greenPatternMatcher;
 	}
 
-	protected void setExpressionPatternMatcher(PatternMatcher expressionPatternMatcher) {
+	protected void setExpressionPatternMatcher(final PatternMatcher expressionPatternMatcher) {
 		this.expressionPatternMatcher = expressionPatternMatcher;
 	}
 
-	protected PatternMatcher configureBindingAndBlackPatternMatcher(Resource resource) throws IOException {
+	protected PatternMatcher configureBindingAndBlackPatternMatcher(final Resource resource) throws IOException {
 		return configureBindingAndBlackPatternMatcherCompiler(resource);
 	}
 
-	protected PatternMatcherCompiler configureBindingAndBlackPatternMatcherCompiler(Resource resource) {
+	protected PatternMatcherCompiler configureBindingAndBlackPatternMatcherCompiler(final Resource resource) {
 		// Configuring binding & black pattern matcher
-		final CompilerPatternBuilder bindingAndBlackCompilerPatternBuilder = new CompilerPatternBuilder();
-		bindingAndBlackCompilerPatternBuilder.addOperationBuilder(basicOperationBuilder);
-		bindingAndBlackCompilerPatternBuilder.setAlgorithm(algorithm);
+		final var bindingAndBlackCompilerPatternBuilder = new CompilerPatternBuilder();
+		bindingAndBlackCompilerPatternBuilder.addOperationBuilder(this.basicOperationBuilder);
+		bindingAndBlackCompilerPatternBuilder.setAlgorithm(this.algorithm);
 
 		final PatternMatcherCompiler bindingAndBlackPatternMatcherCompiler = new BindingAndBlackPatternMatcherCompiler(
-				bindingAndBlackPatternBuilder, bindingAndBlackCompilerPatternBuilder);
+				this.bindingAndBlackPatternBuilder, bindingAndBlackCompilerPatternBuilder);
 		resource.getContents().add(bindingAndBlackPatternMatcherCompiler);
 		return bindingAndBlackPatternMatcherCompiler;
 	}
 
-	protected PatternMatcher configureBindingPatternMatcher(Resource resource) throws IOException {
+	protected PatternMatcher configureBindingPatternMatcher(final Resource resource) throws IOException {
 		return configureBindingPatternMatcherCompiler(resource);
 	}
 
-	protected PatternMatcherCompiler configureBindingPatternMatcherCompiler(Resource resource) {
+	protected PatternMatcherCompiler configureBindingPatternMatcherCompiler(final Resource resource) {
 		// Configuring binding pattern matcher
 		// final EMFPatternBuilder<DefaultPattern, DefaultPatternBody>
 		// bindingPatternBuilder =
@@ -397,22 +377,22 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 		// bindingPatternBuilder.addConstraintTypeSwitch(internalEMFTypeModule.getConstraintTypeSwitch());
 		// bindingPatternBuilder.addVariableTypeSwitch(internalEMFTypeModule.getVariableTypeSwitch());
 
-		final CompilerPatternBuilder bindingCompilerPatternBuilder = new CompilerPatternBuilder();
-		bindingCompilerPatternBuilder.addOperationBuilder(basicOperationBuilder);
-		bindingCompilerPatternBuilder.addOperationBuilder(bindingAssignmentOperationBuilder);
-		bindingCompilerPatternBuilder.setAlgorithm(algorithm);
+		final var bindingCompilerPatternBuilder = new CompilerPatternBuilder();
+		bindingCompilerPatternBuilder.addOperationBuilder(this.basicOperationBuilder);
+		bindingCompilerPatternBuilder.addOperationBuilder(this.bindingAssignmentOperationBuilder);
+		bindingCompilerPatternBuilder.setAlgorithm(this.algorithm);
 
-		final PatternMatcherCompiler bindingPatternMatcherCompiler = new PatternMatcherCompiler(
-				bindingAndBlackPatternBuilder, bindingCompilerPatternBuilder);
+		final var bindingPatternMatcherCompiler = new PatternMatcherCompiler(
+				this.bindingAndBlackPatternBuilder, bindingCompilerPatternBuilder);
 		resource.getContents().add(bindingPatternMatcherCompiler);
 		return bindingPatternMatcherCompiler;
 	}
 
-	protected PatternMatcher configureBlackPatternMatcher(Resource resource) throws IOException {
+	protected PatternMatcher configureBlackPatternMatcher(final Resource resource) throws IOException {
 		return configureBlackPatternMatcherCompiler(resource);
 	}
 
-	protected PatternMatcherCompiler configureBlackPatternMatcherCompiler(Resource resource) {
+	protected PatternMatcherCompiler configureBlackPatternMatcherCompiler(final Resource resource) {
 		// Configuring black pattern matcher
 		// final EMFPatternBuilder<DefaultPattern, DefaultPatternBody>
 		// blackPatternBuilder =
@@ -431,86 +411,86 @@ public class DefaultValidatorConfig implements ScopeValidationConfigurator {
 		// blackPatternBuilder.addConstraintTypeSwitch(internalEMFTypeModule.getConstraintTypeSwitch());
 		// blackPatternBuilder.addVariableTypeSwitch(internalEMFTypeModule.getVariableTypeSwitch());
 
-		final CompilerPatternBuilder blackCompilerPatternBuilder = new CompilerPatternBuilder();
-		blackCompilerPatternBuilder.addOperationBuilder(emfBlackOperationBuilder);
-		blackCompilerPatternBuilder.addOperationBuilder(relationalOperationBuilder);
-		blackCompilerPatternBuilder.setAlgorithm(algorithm);
+		final var blackCompilerPatternBuilder = new CompilerPatternBuilder();
+		blackCompilerPatternBuilder.addOperationBuilder(this.emfBlackOperationBuilder);
+		blackCompilerPatternBuilder.addOperationBuilder(this.relationalOperationBuilder);
+		blackCompilerPatternBuilder.setAlgorithm(this.algorithm);
 
-		final PatternMatcherCompiler blackPatternMatcherCompiler = new PatternMatcherCompiler(
-				bindingAndBlackPatternBuilder, blackCompilerPatternBuilder);
+		final var blackPatternMatcherCompiler = new PatternMatcherCompiler(
+				this.bindingAndBlackPatternBuilder, blackCompilerPatternBuilder);
 		resource.getContents().add(blackPatternMatcherCompiler);
 		return blackPatternMatcherCompiler;
 	}
 
-	protected PatternMatcher configureRedPatternMatcher(Resource resource) throws IOException {
+	protected PatternMatcher configureRedPatternMatcher(final Resource resource) throws IOException {
 		return configureRedPatternMatcherCompiler(resource);
 	}
 
-	protected PatternMatcherCompiler configureRedPatternMatcherCompiler(Resource resource) {
+	protected PatternMatcherCompiler configureRedPatternMatcherCompiler(final Resource resource) {
 		// Configuring red pattern matcher
-		final EMFPatternBuilder<DefaultPattern, DefaultPatternBody> redPatternBuilder = new EMFPatternBuilder<DefaultPattern, DefaultPatternBody>(
+		final var redPatternBuilder = new EMFPatternBuilder<>(
 				new DefaultPatternFactory());
-		redPatternBuilder.addConstraintTypeSwitch(internalEMFTypeModule.getConstraintTypeSwitch());
-		redPatternBuilder.addVariableTypeSwitch(internalEMFTypeModule.getVariableTypeSwitch());
+		redPatternBuilder.addConstraintTypeSwitch(this.internalEMFTypeModule.getConstraintTypeSwitch());
+		redPatternBuilder.addVariableTypeSwitch(this.internalEMFTypeModule.getVariableTypeSwitch());
 
-		final CompilerPatternBuilder redCompilerPatternBuilder = new CompilerPatternBuilder();
-		redCompilerPatternBuilder.addOperationBuilder(emfRedOperationBuilder);
-		redCompilerPatternBuilder.setAlgorithm(algorithm);
+		final var redCompilerPatternBuilder = new CompilerPatternBuilder();
+		redCompilerPatternBuilder.addOperationBuilder(this.emfRedOperationBuilder);
+		redCompilerPatternBuilder.setAlgorithm(this.algorithm);
 
-		final PatternMatcherCompiler redPatternMatcherCompiler = new PatternMatcherCompiler(redPatternBuilder,
+		final var redPatternMatcherCompiler = new PatternMatcherCompiler(redPatternBuilder,
 				redCompilerPatternBuilder);
 		resource.getContents().add(redPatternMatcherCompiler);
 		return redPatternMatcherCompiler;
 	}
 
-	protected PatternMatcher configureGreenPatternMatcher(Resource resource) throws IOException {
+	protected PatternMatcher configureGreenPatternMatcher(final Resource resource) throws IOException {
 		return configureGreenPatternMatcherCompiler(resource);
 	}
 
-	protected PatternMatcherCompiler configureGreenPatternMatcherCompiler(Resource resource) {
+	protected PatternMatcherCompiler configureGreenPatternMatcherCompiler(final Resource resource) {
 		// Configuring green pattern matcher
-		final EMFPatternBuilder<DefaultPattern, DefaultPatternBody> greenPatternBuilder = new EMFPatternBuilder<DefaultPattern, DefaultPatternBody>(
+		final var greenPatternBuilder = new EMFPatternBuilder<>(
 				new DefaultPatternFactory());
-		greenPatternBuilder.addConstraintTypeSwitch(internalRelationalTypeModule.getConstraintTypeSwitch());
-		greenPatternBuilder.addConstraintTypeSwitch(internalEMFTypeModule.getConstraintTypeSwitch());
-		greenPatternBuilder.addVariableTypeSwitch(internalEMFTypeModule.getVariableTypeSwitch());
+		greenPatternBuilder.addConstraintTypeSwitch(this.internalRelationalTypeModule.getConstraintTypeSwitch());
+		greenPatternBuilder.addConstraintTypeSwitch(this.internalEMFTypeModule.getConstraintTypeSwitch());
+		greenPatternBuilder.addVariableTypeSwitch(this.internalEMFTypeModule.getVariableTypeSwitch());
 
-		final CompilerPatternBuilder greenCompilerPatternBuilder = new CompilerPatternBuilder();
-		greenCompilerPatternBuilder.addOperationBuilder(assignmentOperationBuilder);
-		greenCompilerPatternBuilder.addOperationBuilder(emfGreenOperationBuilder);
-		greenCompilerPatternBuilder.setAlgorithm(algorithm);
+		final var greenCompilerPatternBuilder = new CompilerPatternBuilder();
+		greenCompilerPatternBuilder.addOperationBuilder(this.assignmentOperationBuilder);
+		greenCompilerPatternBuilder.addOperationBuilder(this.emfGreenOperationBuilder);
+		greenCompilerPatternBuilder.setAlgorithm(this.algorithm);
 
-		final PatternMatcherCompiler greenPatternMatcherCompiler = new PatternMatcherCompiler(greenPatternBuilder,
+		final var greenPatternMatcherCompiler = new PatternMatcherCompiler(greenPatternBuilder,
 				greenCompilerPatternBuilder);
 		resource.getContents().add(greenPatternMatcherCompiler);
 		return greenPatternMatcherCompiler;
 	}
 
-	protected PatternMatcher configureExpressionPatternMatcher(Resource resource) throws IOException {
+	protected PatternMatcher configureExpressionPatternMatcher(final Resource resource) throws IOException {
 		return configureExpressionPatternMatcherCompiler(resource);
 	}
 
-	protected PatternMatcherCompiler configureExpressionPatternMatcherCompiler(Resource resource) {
+	protected PatternMatcherCompiler configureExpressionPatternMatcherCompiler(final Resource resource) {
 		// Configuring expression pattern matcher
-		final EMFPatternBuilder<DefaultPattern, DefaultPatternBody> expressionPatternBuilder = new EMFPatternBuilder<DefaultPattern, DefaultPatternBody>(
+		final var expressionPatternBuilder = new EMFPatternBuilder<>(
 				new DefaultPatternFactory());
-		expressionPatternBuilder.addConstraintTypeSwitch(internalRelationalTypeModule.getConstraintTypeSwitch());
-		expressionPatternBuilder.addVariableTypeSwitch(internalEMFTypeModule.getVariableTypeSwitch());
-		expressionPatternBuilder.addConstraintTypeSwitch(internalEMFTypeModule.getConstraintTypeSwitch());
+		expressionPatternBuilder.addConstraintTypeSwitch(this.internalRelationalTypeModule.getConstraintTypeSwitch());
+		expressionPatternBuilder.addVariableTypeSwitch(this.internalEMFTypeModule.getVariableTypeSwitch());
+		expressionPatternBuilder.addConstraintTypeSwitch(this.internalEMFTypeModule.getConstraintTypeSwitch());
 
-		final CompilerPatternBuilder expressionCompilerPatternBuilder = new CompilerPatternBuilder();
-		expressionCompilerPatternBuilder.addOperationBuilder(assignmentOperationBuilder);
-		expressionCompilerPatternBuilder.addOperationBuilder(basicOperationBuilder);
-		expressionCompilerPatternBuilder.setAlgorithm(algorithm);
+		final var expressionCompilerPatternBuilder = new CompilerPatternBuilder();
+		expressionCompilerPatternBuilder.addOperationBuilder(this.assignmentOperationBuilder);
+		expressionCompilerPatternBuilder.addOperationBuilder(this.basicOperationBuilder);
+		expressionCompilerPatternBuilder.setAlgorithm(this.algorithm);
 
-		final PatternMatcherCompiler expressionPatternMatcherCompiler = new PatternMatcherCompiler(
+		final var expressionPatternMatcherCompiler = new PatternMatcherCompiler(
 				expressionPatternBuilder, expressionCompilerPatternBuilder);
 		resource.getContents().add(expressionPatternMatcherCompiler);
 		return expressionPatternMatcherCompiler;
 	}
 
 	@Override
-	public TemplateConfigurationProvider createTemplateConfiguration(GenModel genModel) {
+	public TemplateConfigurationProvider createTemplateConfiguration(final GenModel genModel) {
 		return new DefaultTemplateConfiguration(genModel);
 	}
 }

@@ -497,10 +497,4 @@
         </command>
      </menuContribution>
   </extension>
-  <extension
-        point="net.sourceforge.plantuml.eclipse.diagramTextProvider">
-     <diagramTextProvider
-           providerClass="org.moflon.tgg.mosl.ui.visualisation.MOSLTGGDiagramTextProvider">
-     </diagramTextProvider>
-  </extension>
 </plugin>

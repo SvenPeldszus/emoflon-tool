@@ -19,7 +19,7 @@ import gnu.trove.set.hash.TIntHashSet;
 
 /**
  * Represents a set of matches and precedence dependencies between matches.
- * 
+ *
  * @author anjorin
  *
  */
@@ -37,85 +37,88 @@ public abstract class PrecedenceStructure<M> {
 
 	private int counter = 1;
 
-	protected void calculateTables(M match) {
+	protected void calculateTables(final M match) {
 
-		matchToInt.put(match, counter);
+		this.matchToInt.put(match, this.counter);
 
-		matches.put(counter, match);
+		this.matches.put(this.counter, match);
 
-		counter++;
+		this.counter++;
 
 		getCreatedElements(match).forEach(elt -> addMatchToCreateTable(elt, matchToInt(match)));
 		getContextElements(match).forEach(elt -> addMatchToContextTable(elt, matchToInt(match)));
 
-		TIntHashSet children = extendChildrenTable(match);
-		TIntHashSet parents = extendParentsTable(match);
+		final TIntHashSet children = extendChildrenTable(match);
+		final TIntHashSet parents = extendParentsTable(match);
 
 		children.forEach(c -> {
-			if (matchToParents.contains(c))
-				matchToParents.get(c).add(matchToInt(match));
+			if (this.matchToParents.contains(c)) {
+				this.matchToParents.get(c).add(matchToInt(match));
+			}
 			return true;
 		});
 
 		parents.forEach(p -> {
-			if (matchToChildren.contains(p))
-				matchToChildren.get(p).add(matchToInt(match));
+			if (this.matchToChildren.contains(p)) {
+				this.matchToChildren.get(p).add(matchToInt(match));
+			}
 			return true;
 		});
 	}
 
-	public void removeMatches(Collection<M> toBeRemoved) {
+	public void removeMatches(final Collection<M> toBeRemoved) {
 
-		int[] allTobeRevokedIDs = new int[toBeRemoved.size()];
+		final int[] allTobeRevokedIDs = new int[toBeRemoved.size()];
 		int i = 0;
-		for (M m : toBeRemoved) {
+		for (final M m : toBeRemoved) {
 			allTobeRevokedIDs[i] = matchToInt(m);
 			i++;
 		}
 
-		createToMatch.keySet().forEach(elt -> createToMatch.get(elt).removeAll(allTobeRevokedIDs));
-		contextToMatch.keySet().forEach(elt -> contextToMatch.get(elt).removeAll(allTobeRevokedIDs));
+		this.createToMatch.keySet().forEach(elt -> this.createToMatch.get(elt).removeAll(allTobeRevokedIDs));
+		this.contextToMatch.keySet().forEach(elt -> this.contextToMatch.get(elt).removeAll(allTobeRevokedIDs));
 
-		for (int id : allTobeRevokedIDs) {
-			matchToChildren.get(id).forEach(child -> matchToParents.get(child).remove(id));
-			matchToParents.get(id).forEach(parent -> matchToChildren.get(parent).remove(id));
-			matchToChildren.remove(id);
-			matchToParents.remove(id);
-			matches.remove(id);
+		for (final int id : allTobeRevokedIDs) {
+			this.matchToChildren.get(id).forEach(child -> this.matchToParents.get(child).remove(id));
+			this.matchToParents.get(id).forEach(parent -> this.matchToChildren.get(parent).remove(id));
+			this.matchToChildren.remove(id);
+			this.matchToParents.remove(id);
+			this.matches.remove(id);
 		}
 	}
 
 	// -------
 
-	private void addMatchToContextTable(EObject element, int id) {
-		addMatchToTable(contextToMatch, element, id);
+	private void addMatchToContextTable(final EObject element, final int id) {
+		addMatchToTable(this.contextToMatch, element, id);
 	}
 
-	private void addMatchToCreateTable(EObject element, int id) {
-		addMatchToTable(createToMatch, element, id);
+	private void addMatchToCreateTable(final EObject element, final int id) {
+		addMatchToTable(this.createToMatch, element, id);
 	}
 
-	private void addMatchToTable(HashMap<EObject, TIntArrayList> table, EObject element, int id) {
-		if (!table.containsKey(element))
+	private void addMatchToTable(final HashMap<EObject, TIntArrayList> table, final EObject element, final int id) {
+		if (!table.containsKey(element)) {
 			table.put(element, new TIntArrayList());
+		}
 
 		table.get(element).add(id);
 	}
 
 	// --------
 
-	private TIntHashSet extendChildrenTable(M match) {
-		return extendTable(match, getCreatedElements(match), contextToMatch, matchToChildren);
+	private TIntHashSet extendChildrenTable(final M match) {
+		return extendTable(match, getCreatedElements(match), this.contextToMatch, this.matchToChildren);
 	}
 
-	private TIntHashSet extendParentsTable(M match) {
-		return extendTable(match, getContextElements(match), createToMatch, matchToParents);
+	private TIntHashSet extendParentsTable(final M match) {
+		return extendTable(match, getContextElements(match), this.createToMatch, this.matchToParents);
 	}
 
-	private TIntHashSet extendTable(M match, Collection<EObject> elements, HashMap<EObject, TIntArrayList> eltToMatches,
-			TIntObjectHashMap<TIntHashSet> matchTable) {
-		TIntHashSet table = new TIntHashSet();
-		for (EObject elt : elements) {
+	private TIntHashSet extendTable(final M match, final Collection<EObject> elements, final HashMap<EObject, TIntArrayList> eltToMatches,
+			final TIntObjectHashMap<TIntHashSet> matchTable) {
+		final TIntHashSet table = new TIntHashSet();
+		for (final EObject elt : elements) {
 			table.addAll(getOrReturnEmpty(elt, eltToMatches));
 			table.remove(matchToInt(match));
 		}
@@ -123,61 +126,66 @@ public abstract class PrecedenceStructure<M> {
 		return table;
 	}
 
-	protected TIntArrayList getOrReturnEmpty(EObject elt, HashMap<EObject, TIntArrayList> table) {
-		if (table.containsKey(elt))
+	protected TIntArrayList getOrReturnEmpty(final EObject elt, final HashMap<EObject, TIntArrayList> table) {
+		if (table.containsKey(elt)) {
 			return table.get(elt);
-		else
+		} else {
 			return new TIntArrayList();
+		}
 	}
 
 	// ---------
 
-	public TIntCollection children(int m) {
-		if (!matchToChildren.containsKey(m))
+	public TIntCollection children(final int m) {
+		if (!this.matchToChildren.containsKey(m)) {
 			return new TIntHashSet();
-		return matchToChildren.get(m);
+		}
+		return this.matchToChildren.get(m);
 	}
 
-	public TIntCollection parents(int m) {
-		if (!matchToParents.containsKey(m))
+	public TIntCollection parents(final int m) {
+		if (!this.matchToParents.containsKey(m)) {
 			return new TIntHashSet();
-		return matchToParents.get(m);
+		}
+		return this.matchToParents.get(m);
 	}
 
 	// ----------
 
-	public TIntCollection creates(EObject o) {
-		return createToMatch.get(o);
+	public TIntCollection creates(final EObject o) {
+		return this.createToMatch.get(o);
 	}
 
-	public Stream<M> createsAsStream(Graph elements) {
+	public Stream<M> createsAsStream(final Graph elements) {
 		return elements.stream().flatMap(e -> getCreatingMatches(e).stream());
 	}
 
-	public Stream<M> createsAsStream(EObject elt) {
+	public Stream<M> createsAsStream(final EObject elt) {
 		return getCreatingMatches(elt).stream();
 	}
 
-	public Collection<M> getCreatingMatches(EObject o) {
-		if (createToMatch.containsKey(o))
+	public Collection<M> getCreatingMatches(final EObject o) {
+		if (this.createToMatch.containsKey(o)) {
 			return getAsCollection(creates(o));
-		else
+		} else {
 			return Collections.emptyList();
+		}
 	}
 
-	public Collection<M> getContextMatches(EObject o) {
-		if (contextToMatch.containsKey(o))
-			return getAsCollection(contextToMatch.get(o));
-		else
+	public Collection<M> getContextMatches(final EObject o) {
+		if (this.contextToMatch.containsKey(o)) {
+			return getAsCollection(this.contextToMatch.get(o));
+		} else {
 			return Collections.emptyList();
+		}
 	}
 
 	public Collection<M> getMatches() {
-		return new ArrayList<M>(matches.valueCollection());
+		return new ArrayList<>(this.matches.valueCollection());
 	}
 
 	public TIntCollection getMatchIDs() {
-		return new TIntHashSet(matches.keySet());
+		return new TIntHashSet(this.matches.keySet());
 	}
 
 	public abstract Collection<EObject> getContextElements(M m);
@@ -187,16 +195,17 @@ public abstract class PrecedenceStructure<M> {
 	// ----------
 
 	public org.moflon.tgg.runtime.PrecedenceStructure save() {
-		org.moflon.tgg.runtime.PrecedenceStructure ps = RuntimeFactory.eINSTANCE.createPrecedenceStructure();
+		final org.moflon.tgg.runtime.PrecedenceStructure ps = RuntimeFactory.eINSTANCE.createPrecedenceStructure();
 
-		HashMap<M, org.moflon.tgg.runtime.TripleMatch> conversionTable = convertToMatches();
+		final HashMap<M, org.moflon.tgg.runtime.TripleMatch> conversionTable = convertToMatches();
 		ps.getTripleMatches().addAll(conversionTable.values().stream().sorted((a, b) -> a.getNumber() - b.getNumber())
 				.collect(Collectors.toList()));
 
 		getMatchIDs().forEach(m -> {
 			children(m).forEach(child -> {
-				if (conversionTable.containsKey(intToMatch(m)))
+				if (conversionTable.containsKey(intToMatch(m))) {
 					conversionTable.get(intToMatch(m)).getChildren().add(conversionTable.get(intToMatch(child)));
+				}
 				return true;
 			});
 			return true;
@@ -206,13 +215,13 @@ public abstract class PrecedenceStructure<M> {
 	}
 
 	private HashMap<M, org.moflon.tgg.runtime.TripleMatch> convertToMatches() {
-		HashMap<M, org.moflon.tgg.runtime.TripleMatch> conversionTable = new HashMap<>();
+		final HashMap<M, org.moflon.tgg.runtime.TripleMatch> conversionTable = new HashMap<>();
 		getMatches().forEach(m -> conversionTable.put(m, toEMF(m)));
 
 		return conversionTable;
 	}
 
-	protected void addEdges(org.moflon.tgg.runtime.TripleMatch tripleMatch) {
+	protected void addEdges(final org.moflon.tgg.runtime.TripleMatch tripleMatch) {
 		tripleMatch.getContextElements().forEach(elt -> {
 			addIfEdge(tripleMatch, elt);
 		});
@@ -234,31 +243,33 @@ public abstract class PrecedenceStructure<M> {
 		});
 	}
 
-	private void addIfEdge(org.moflon.tgg.runtime.TripleMatch tripleMatch, EObject elt) {
-		if (elt instanceof EMoflonEdge)
-			tripleMatch.getContainedEdges().add(elt);
+	private void addIfEdge(final org.moflon.tgg.runtime.TripleMatch tripleMatch, final EObject elt) {
+		if (elt instanceof EMoflonEdge) {
+			tripleMatch.getContainedEdges().add((EMoflonEdge) elt);
+		}
 	}
 
-	public Collection<M> createsAsCollection(EObject elt) {
-		return getAsCollection(createToMatch.get(elt));
+	public Collection<M> createsAsCollection(final EObject elt) {
+		return getAsCollection(this.createToMatch.get(elt));
 	}
 
 	protected abstract org.moflon.tgg.runtime.TripleMatch toEMF(M m);
 
 	protected abstract M fromEMF(org.moflon.tgg.runtime.TripleMatch m);
 
-	public M intToMatch(int id) {
-		if (!matches.containsKey(id))
+	public M intToMatch(final int id) {
+		if (!this.matches.containsKey(id)) {
 			throw new RuntimeException("never seen that match id before");
-		return matches.get(id);
+		}
+		return this.matches.get(id);
 	}
 
-	public int matchToInt(M m) {
-		return matchToInt.get(m);
+	public int matchToInt(final M m) {
+		return this.matchToInt.get(m);
 	}
 
-	public Collection<M> getAsCollection(TIntCollection tIntCollection) {
-		ArrayList<M> result = new ArrayList<>();
+	public Collection<M> getAsCollection(final TIntCollection tIntCollection) {
+		final ArrayList<M> result = new ArrayList<>();
 		tIntCollection.forEach(i -> {
 			result.add(intToMatch(i));
 			return true;

@@ -5,7 +5,7 @@ Bundle-Vendor: eMoflon Developers
 Bundle-Version: 1.0.1.qualifier
 Bundle-SymbolicName: org.moflon.tgg.mosl.codeadapter;singleton:=true
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ClassPath: .
 Export-Package: org.moflon.tgg.mosl.builder,
  org.moflon.tgg.mosl.codeadapter,
@@ -16,12 +16,8 @@ Export-Package: org.moflon.tgg.mosl.builder,
  org.moflon.tgg.mosl.codeadapter.util,
  org.moflon.tgg.mosl.codeadapter.org.moflon.tie
 Require-Bundle: org.moflon.core.utilities,
- org.gervarro.eclipse.workspace.util;bundle-version="[2.0.0,3.0.0)",
- org.gervarro.eclipse.workspace.autosetup;bundle-version="[1.0.0,2.0.0)",
- org.gervarro.eclipse.task;bundle-version="1.0.1",
  SDMLanguage,
  org.moflon.ide.core;bundle-version="2.1.0",
- org.moflon.sdm.compiler.eclipse;bundle-version="2.0.0",
  org.moflon.tgg.runtime,
  org.moflon.tgg.mosl,
  org.moflon.tgg.tggproject,
@@ -30,5 +26,6 @@ Require-Bundle: org.moflon.core.utilities,
  org.moflon.core.plugins;bundle-version="2.2.0",
  MocaTree,
  org.moflon.core.build,
- org.moflon.emf.codegen
+ org.moflon.emf.codegen,
+ org.gervarro.eclipse.workspace.util
 Automatic-Module-Name: org.moflon.tgg.mosl.codeadapter

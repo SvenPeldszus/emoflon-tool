@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Stringtemplate
+Bundle-SymbolicName: org.gervarro.democles.codegen.stringtemplate
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.gervarro.democles.codegen.stringtemplate
+Require-Bundle: org.moflon.core.utilities,
+ org.gervarro.democles.compiler;bundle-version="1.0.0",
+ org.gervarro.democles.common
+Automatic-Module-Name: org.gervarro.democles.codegen.stringtemplate
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-17

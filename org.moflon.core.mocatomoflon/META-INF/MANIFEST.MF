@@ -22,10 +22,9 @@ Require-Bundle: org.eclipse.emf.ecore.xmi;bundle-version="[2.8.1,3.0.0)",
  org.moflon.tgg.cspcodeadapter,
  org.moflon.tgg.language,
  org.moflon.core.ecoreutils,
- org.eclipse.emf.ecore,
- org.stringtemplate
+ org.antlr.runtime;bundle-version="3.2.0"
 Bundle-ManifestVersion: 2
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: eMoflon Developers
 Automatic-Module-Name: org.moflon.core.mocatomoflon

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Emf
+Bundle-SymbolicName: org.gervarro.democles.codegen.emf
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.emf.ecore,
+ org.gervarro.democles.compiler;bundle-version="1.0.0",
+ org.gervarro.democles.common,
+ org.gervarro.democles.emf,
+ org.eclipse.emf.codegen.ecore
+Automatic-Module-Name: org.gervarro.democles.codegen.emf
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: org.gervarro.democles.codegen.emf

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse Workspace Util
+Bundle-SymbolicName: org.gervarro.eclipse.workspace.util
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.gervarro.eclipse.task,
+ org.gervarro.eclipse.workspace.autosetup,
+ org.gervarro.eclipse.workspace.util
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.apache.ant
+Automatic-Module-Name: org.gervarro.eclipse.workspace.util
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-17

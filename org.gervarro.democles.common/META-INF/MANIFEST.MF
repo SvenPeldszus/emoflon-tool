@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Common
+Bundle-SymbolicName: org.gervarro.democles.common
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.gervarro.democles.common,
+ org.gervarro.democles.common.runtime,
+ org.gervarro.democles.constraint,
+ org.gervarro.democles.event,
+ org.gervarro.democles.specification,
+ org.gervarro.democles.specification.impl,
+ org.gervarro.extension
+Automatic-Module-Name: org.gervarro.democles.common
+Bundle-RequiredExecutionEnvironment: JavaSE-17

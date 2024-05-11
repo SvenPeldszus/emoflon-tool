@@ -1,16 +1,13 @@
 package org.moflon.ide.ui.admin.handlers;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.moflon.core.ui.AbstractCommandHandler;
 import org.moflon.core.utilities.eMoflonEMFUtil;
 import org.moflon.sdm.constraints.constraintstodemocles.AttributeConstraintLibraryUtil;
@@ -24,10 +21,11 @@ public class CreateUserDefinedConstraintsLibraryHandler extends AbstractMoflonTo
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		final Collection<IProject> projects = this.extractSelectedProjects(event);
+		final var projects = extractSelectedProjects(event);
 		try {
-			for (final IProject project : projects)
+			for (final IProject project : projects) {
 				createLibraryInProject(project);
+			}
 		} catch (final IOException e) {
 			throw new ExecutionException(e.getMessage(), e);
 		}
@@ -44,12 +42,13 @@ public class CreateUserDefinedConstraintsLibraryHandler extends AbstractMoflonTo
 	 *             if the library cannot be saved
 	 */
 	private void createLibraryInProject(final IProject project) throws IOException {
-		final URI uri = AttributeConstraintLibraryUtil.getURIOfUserDefinedLibrary(project);
-		final ResourceSet resourceSet = eMoflonEMFUtil.createDefaultResourceSet();
-		final Resource libraryResource = AttributeConstraintLibraryUtil.loadAttributeConstraintLibraryResource(uri,
+		final var uri = AttributeConstraintLibraryUtil.getURIOfUserDefinedLibrary(project);
+		final var resourceSet = eMoflonEMFUtil.createDefaultResourceSet();
+		final var libraryResource = AttributeConstraintLibraryUtil.loadAttributeConstraintLibraryResource(uri,
 				true, resourceSet);
-		if (libraryResource.getContents().isEmpty())
+		if (libraryResource.getContents().isEmpty()) {
 			fillAndSaveNewLibrary(project, libraryResource);
+		}
 	}
 
 	/**

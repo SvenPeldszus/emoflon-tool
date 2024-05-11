@@ -23,6 +23,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainer;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainerHelper;
+import org.moflon.core.propertycontainer.TGGBuildMode;
 import org.moflon.core.utilities.ExceptionUtil;
 import org.moflon.core.utilities.MoflonConventions;
 import org.moflon.core.utilities.MoflonUtil;
@@ -68,7 +69,7 @@ public class IntegrationBuilder extends RepositoryBuilder {
 
 	private static final Logger logger = Logger.getLogger(IntegrationBuilder.class);
 
-	private List<TGGConstraint> userDefinedConstraints = new ArrayList<TGGConstraint>();
+	private final List<TGGConstraint> userDefinedConstraints = new ArrayList<>();
 
 	private TripleGraphGrammar tgg;
 
@@ -77,7 +78,7 @@ public class IntegrationBuilder extends RepositoryBuilder {
 	}
 
 	@Override
-	protected void processResource(IResource resource, int kind, Map<String, String> args, IProgressMonitor monitor) {
+	protected void processResource(final IResource resource, final int kind, final Map<String, String> args, final IProgressMonitor monitor) {
 		if (resource.getProjectRelativePath().toString().equals(MoflonConventions
 				.getDefaultPathToFileInProject(getProject().getName(), MoslTggConstants.PRE_ECORE_FILE_EXTENSION))) {
 			try {
@@ -139,12 +140,12 @@ public class IntegrationBuilder extends RepositoryBuilder {
 		final Resource tggResource = metamodelLoader.getMainResource();
 		final Resource ecoreResource = set.getResource(ecoreFileURI, false);
 		MetamodelLoader.setEPackageURI((EPackage) ecoreResource.getContents().get(0));
-		tgg = (TripleGraphGrammar) tggResource.getContents().get(0);
+		this.tgg = (TripleGraphGrammar) tggResource.getContents().get(0);
 		uriMapping.remove(tggFileURI);
 		uriMapping.remove(ecoreFileURI);
 		subMon.worked(5);
 
-		if (tgg.getTggRule().isEmpty()) {
+		if (this.tgg.getTggRule().isEmpty()) {
 			return new Status(IStatus.WARNING, WorkspaceHelper.getPluginId(getClass()), IStatus.WARNING,
 					"Your TGG does not contain any rules, aborting attempt to generate code...", null);
 		}
@@ -152,13 +153,13 @@ public class IntegrationBuilder extends RepositoryBuilder {
 		subMon.subTask(getProject().getName() + ": Translating TGG model to SDMs...");
 		// Create and add precompiler to resourceSet so reverse navigation of links
 		// works
-		TGGPrecompiler precompiler = PrecompilerFactory.eINSTANCE.createTGGPrecompiler();
+		final TGGPrecompiler precompiler = PrecompilerFactory.eINSTANCE.createTGGPrecompiler();
 		eMoflonEMFUtil.createParentResourceAndInsertIntoResourceSet(precompiler, set);
 
 		// Precompile rules
 		precompiler.setUseNewImpl(true);
 		try {
-			precompiler.precompileTGG(tgg);
+			precompiler.precompileTGG(this.tgg);
 		} catch (final RuntimeException e) {
 			return ExceptionUtil.createDefaultErrorStatus(getClass(), e);
 		}
@@ -176,7 +177,7 @@ public class IntegrationBuilder extends RepositoryBuilder {
 		}
 
 		// Persist tgg model after precompilation
-		HashMap<String, Object> saveOptions = new HashMap<String, Object>();
+		final HashMap<String, Object> saveOptions = new HashMap<>();
 		saveOptions.put(SDMEnhancedEcoreResource.SAVE_GENERATED_PACKAGE_CROSSREF_URIS, Boolean.valueOf(true));
 		saveOptions.put(Resource.OPTION_SAVE_ONLY_IF_CHANGED, Resource.OPTION_SAVE_ONLY_IF_CHANGED_MEMORY_BUFFER);
 
@@ -188,34 +189,34 @@ public class IntegrationBuilder extends RepositoryBuilder {
 		subMon.worked(5);
 
 		// Prepare injection resource compiler injections
-		URI compilerInjectionFileURI = URI.createURI(
+		final URI compilerInjectionFileURI = URI.createURI(
 				tggResource.getURI().toString().replace(MoslTggConstants.TGG_FILE_EXTENSION, ".injection.xmi"));
-		PackageRemappingDependency compilerInjectionFile = new PackageRemappingDependency(compilerInjectionFileURI);
-		Resource compilerInjectionResource = compilerInjectionFile.getResource(set, false);
-		InjectionHelper injectionHelper = CompilerfacadeFactory.eINSTANCE.createInjectionHelper();
-		CompilerInjection compilerInjection = SdmUtilFactory.eINSTANCE.createCompilerInjection();
+		final PackageRemappingDependency compilerInjectionFile = new PackageRemappingDependency(compilerInjectionFileURI);
+		final Resource compilerInjectionResource = compilerInjectionFile.getResource(set, false);
+		final InjectionHelper injectionHelper = CompilerfacadeFactory.eINSTANCE.createInjectionHelper();
+		final CompilerInjection compilerInjection = SdmUtilFactory.eINSTANCE.createCompilerInjection();
 		injectionHelper.setCompilerInjection(compilerInjection);
 		subMon.worked(5);
 
 		if (isSynchronizationMode(moflonProperties)) {
-			TGGCompiler compiler = CompilerFactory.eINSTANCE.createTGGCompiler();
+			final TGGCompiler compiler = CompilerFactory.eINSTANCE.createTGGCompiler();
 			eMoflonEMFUtil.createParentResourceAndInsertIntoResourceSet(compiler, set);
 
 			compiler.setProperties(moflonProperties);
 			compiler.setInjectionHelper(injectionHelper);
 			try {
-				compiler.deriveOperationalRules(tgg,
+				compiler.deriveOperationalRules(this.tgg,
 						ApplicationTypes.get(moflonProperties.getTGGBuildMode().getBuildMode().getValue()));
 			} catch (final RuntimeException e) {
 				return ExceptionUtil.createDefaultErrorStatus(getClass(), e);
 			}
-			StaticAnalysis staticAnalysis = compiler.getStaticAnalysis();
+			final StaticAnalysis staticAnalysis = compiler.getStaticAnalysis();
 
 			// Persist results of static analysis
-			URI smaFileURI = URI.createURI(
+			final URI smaFileURI = URI.createURI(
 					tggResource.getURI().toString().replace(MoslTggConstants.TGG_FILE_EXTENSION, SUFFIX_SMA));
-			PackageRemappingDependency smaFile = new PackageRemappingDependency(smaFileURI);
-			Resource smaResource = smaFile.getResource(set, false);
+			final PackageRemappingDependency smaFile = new PackageRemappingDependency(smaFileURI);
+			final Resource smaResource = smaFile.getResource(set, false);
 			if (staticAnalysis != null) {
 				smaResource.getContents().add(staticAnalysis);
 			}
@@ -232,23 +233,23 @@ public class IntegrationBuilder extends RepositoryBuilder {
 
 		if (isModelGenMode(moflonProperties)) {
 			try {
-				org.moflon.tgg.language.modelgenerator.Compiler compiler = org.moflon.tgg.language.modelgenerator.ModelgeneratorFactory.eINSTANCE
+				final org.moflon.tgg.language.modelgenerator.Compiler compiler = org.moflon.tgg.language.modelgenerator.ModelgeneratorFactory.eINSTANCE
 						.createCompiler();
 				eMoflonEMFUtil.createParentResourceAndInsertIntoResourceSet(compiler, set);
 				compiler.setProperties(moflonProperties);
 				compiler.setInjectionHelper(injectionHelper);
 				try {
-					compiler.compileModelgenerationSdms(tgg);
+					compiler.compileModelgenerationSdms(this.tgg);
 				} catch (final RuntimeException e) {
 					return ExceptionUtil.createDefaultErrorStatus(getClass(), e);
 				}
-				for (RuleAnalyzerResult analyzerResult : compiler.getRuleAnalyzer().getRuleAnalyzerResult()) {
+				for (final RuleAnalyzerResult analyzerResult : compiler.getRuleAnalyzer().getRuleAnalyzerResult()) {
 					logger.warn(analyzerResult.getMessage() + ": " + analyzerResult.getEObject());
 				}
 
 				// Persist compiler injections
 				saveInjectionFiles(saveOptions, compiler, compilerInjectionResource);
-			} catch (CSPNotSolvableException e) {
+			} catch (final CSPNotSolvableException e) {
 				logger.warn("CSPs could not be solved for modelgenerator: " + e.getMessage(), e);
 			}
 		}
@@ -262,7 +263,7 @@ public class IntegrationBuilder extends RepositoryBuilder {
 		}
 		subMon.worked(5);
 
-		generateUserDefinedConstraints(userDefinedConstraints);
+		generateUserDefinedConstraints(this.userDefinedConstraints);
 
 		new RunIntegrationGeneratorBatch(getProject()).doFinish();
 		new RunIntegrationGeneratorSync(getProject()).doFinish();
@@ -273,10 +274,10 @@ public class IntegrationBuilder extends RepositoryBuilder {
 	}
 
 	private void enrichCspsWithTypeInformation() {
-		for (TGGRule rule : tgg.getTggRule()) {
-			VariableTypeManager varTypeManager = CspcodeadapterFactory.eINSTANCE.createVariableTypeManager();
+		for (final TGGRule rule : this.tgg.getTggRule()) {
+			final VariableTypeManager varTypeManager = CspcodeadapterFactory.eINSTANCE.createVariableTypeManager();
 			varTypeManager.setTggrule(rule);
-			CSP csp = rule.getCsp();
+			final CSP csp = rule.getCsp();
 			final List<TGGConstraint> constraintsWithMissingName = csp.getConstraints().stream().filter(constraint -> constraint.getName() == null).collect(Collectors.toList());
 			if (!constraintsWithMissingName.isEmpty()) {
 				throw new IllegalStateException(
@@ -286,13 +287,13 @@ public class IntegrationBuilder extends RepositoryBuilder {
 			if (csp != null) {
 				try {
 					varTypeManager.deriveVariableTypes(csp);
-				} catch (IllegalStateException e) {
+				} catch (final IllegalStateException e) {
 					throw new IllegalStateException(
 							"Unable to infer types of attribute constraints used in TGG rule: " + rule.getName());
 				}
-				for (TGGConstraint constraint : csp.getConstraints()) {
+				for (final TGGConstraint constraint : csp.getConstraints()) {
 					if (constraint.isUserDefined()) {
-						userDefinedConstraints.add(constraint);
+						this.userDefinedConstraints.add(constraint);
 					}
 				}
 			}
@@ -308,23 +309,24 @@ public class IntegrationBuilder extends RepositoryBuilder {
 	 * @throws CoreException
 	 */
 	private void generateUserDefinedConstraints(final List<TGGConstraint> userDefinedConstraints) throws CoreException {
-		TGGUserDefinedConstraintUnparserAdapter unparser = new TGGUserDefinedConstraintUnparserAdapter();
-		String pkgPath = "src/" + getProject().getName().replace(".", "/") + "/csp/constraints/";
+		final TGGUserDefinedConstraintUnparserAdapter unparser = new TGGUserDefinedConstraintUnparserAdapter();
+		final String pkgPath = "src/" + getProject().getName().replace(".", "/") + "/csp/constraints/";
 
 		// Create required folder structure
 		WorkspaceHelper.addAllFolders(getProject(), pkgPath, new NullProgressMonitor());
 
 		if (userDefinedConstraints.size() != 0) {
 
-			for (TGGConstraint constraint : userDefinedConstraints) {
-				String content = unparser.unparseCspConstraint(getProject().getName(), constraint);
+			for (final TGGConstraint constraint : userDefinedConstraints) {
+				final String content = unparser.unparseCspConstraint(getProject().getName(), constraint);
 
-				String nameInUpperCase = MocaUtil.firstToUpper(constraint.getName());
-				String path = pkgPath + nameInUpperCase + ".java";
+				final String nameInUpperCase = MocaUtil.firstToUpper(constraint.getName());
+				final String path = pkgPath + nameInUpperCase + ".java";
 
 				// Ignore existing files
-				if (!getProject().getFile(path).exists())
+				if (!getProject().getFile(path).exists()) {
 					WorkspaceHelper.addFile(getProject(), path, content, new NullProgressMonitor());
+				}
 			}
 
 		}
@@ -332,12 +334,13 @@ public class IntegrationBuilder extends RepositoryBuilder {
 
 	private void saveInjectionFiles(final HashMap<String, Object> saveOptions, final TGGCompiler compiler,
 			final Resource compilerInjectionResource) {
-		if (compiler.getInjectionHelper().getCompilerInjection() != null)
+		if (compiler.getInjectionHelper().getCompilerInjection() != null) {
 			compilerInjectionResource.getContents().add(compiler.getInjectionHelper().getCompilerInjection());
+		}
 
 		try {
 			compilerInjectionResource.save(saveOptions);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			logger.error("Unable to persist compiler injection model for project: " + getProject().getName());
 		}
 	}
@@ -354,7 +357,12 @@ public class IntegrationBuilder extends RepositoryBuilder {
 	}
 
 	private boolean isSynchronizationMode(final MoflonPropertiesContainer moflonProperties) {
-		switch (moflonProperties.getTGGBuildMode().getBuildMode()) {
+		final TGGBuildMode tggBuildMode = moflonProperties.getTGGBuildMode();
+		if(tggBuildMode == null) {
+			logger.warn("TGG build mode not set, assuming ALL");
+			return true;
+		}
+		switch (tggBuildMode.getBuildMode()) {
 		case ALL:
 		case FORWARD_AND_BACKWARD:
 		case BACKWARD:
@@ -367,12 +375,12 @@ public class IntegrationBuilder extends RepositoryBuilder {
 
 	private void printPrecompilerLog(final PrecompileLog log) {
 		String errorMessage = "";
-		for (PrecompileMessage error : log.getPrecompileerror()) {
+		for (final PrecompileMessage error : log.getPrecompileerror()) {
 			if (error instanceof CyclicContextMessage) {
-				CyclicContextMessage cycle = (CyclicContextMessage) error;
+				final CyclicContextMessage cycle = (CyclicContextMessage) error;
 				errorMessage += cycle.getMessage() + ": " + error.getRefinementrule() + " cycle found: ";
 
-				for (TGGRule cyclicRule : cycle.getRefineablerules().getTggrule()) {
+				for (final TGGRule cyclicRule : cycle.getRefineablerules().getTggrule()) {
 					errorMessage += cyclicRule.getName() + " ";
 				}
 
@@ -380,9 +388,9 @@ public class IntegrationBuilder extends RepositoryBuilder {
 			}
 
 			if (error instanceof RuleProcessingMessage) {
-				RuleProcessingMessage rule = (RuleProcessingMessage) error;
+				final RuleProcessingMessage rule = (RuleProcessingMessage) error;
 				errorMessage += rule.getMessage() + ": " + error.getRefinementrule() + " basis: " + rule.getBaserule()
-						+ " | Error at " + rule.getTggobjectvariable() + "\n";
+				+ " | Error at " + rule.getTggobjectvariable() + "\n";
 			}
 		}
 		if (!errorMessage.equals("")) {
@@ -392,9 +400,9 @@ public class IntegrationBuilder extends RepositoryBuilder {
 		}
 
 		String warningMessage = "";
-		for (PrecompileMessage warning : log.getPrecompilewarning()) {
+		for (final PrecompileMessage warning : log.getPrecompilewarning()) {
 			if (warning instanceof RuleProcessingMessage) {
-				RuleProcessingMessage rule = (RuleProcessingMessage) warning;
+				final RuleProcessingMessage rule = (RuleProcessingMessage) warning;
 				warningMessage += rule.getMessage() + ": " + warning.getRefinementrule() + " basis: "
 						+ rule.getBaserule() + " | Refining: " + rule.getTggobjectvariable() + "\n";
 			}

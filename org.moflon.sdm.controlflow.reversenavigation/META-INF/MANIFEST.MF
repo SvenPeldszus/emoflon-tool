@@ -5,17 +5,20 @@ Bundle-SymbolicName: org.moflon.sdm.controlflow.reversenavigation;singleton:=tru
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: eMoflon Developers
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.core.resources;bundle-version="[3.8.101,4.0.0)",
- org.eclipse.core.runtime;bundle-version="[3.9.0,4.0.0)",
- org.eclipse.emf.codegen.ecore;bundle-version="[2.10.0,3.0.0)",
- org.stringtemplate;bundle-version="[4.2.1,5.0.0)",
- org.moflon.core.utilities,
- org.moflon.sdm.democles.patternmatcher;bundle-version="[0.4.0,0.5.0)",
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Require-Bundle: org.moflon.core.utilities,
  org.moflon.sdm.compiler.democles,
  org.moflon.sdm.compiler.eclipse,
- org.moflon.sdm.compiler.democles.validation.scope,
- org.moflon.core.build,
  org.moflon.core.preferences,
- org.moflon.emf.build
+ org.moflon.emf.build,
+ org.eclipse.core.runtime,
+ org.gervarro.democles.compiler;bundle-version="1.0.0",
+ org.gervarro.democles.plan;bundle-version="1.0.0",
+ org.gervarro.democles.codegen.emf,
+ org.gervarro.democles.specification.emf,
+ org.gervarro.democles.common;bundle-version="1.0.0",
+ org.gervarro.democles.emf,
+ org.moflon.sdm.compiler.democles.validation.scope;bundle-version="2.0.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.codegen.ecore
 Automatic-Module-Name: org.moflon.sdm.controlflow.reversenavigation

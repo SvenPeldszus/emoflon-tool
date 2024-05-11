@@ -3,9 +3,7 @@ package org.moflon.tgg.mosl.defaults;
 import static org.moflon.core.utilities.WorkspaceHelper.addAllFoldersAndFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -40,7 +38,7 @@ public class AttrCondDefLibraryProvider {
 	public static final String moslPath = PACKAGE_PATH_TO_LIBRARY;
 
 	public static void syncAttrCondDefLibrary(final IProject project) throws CoreException {
-		final IFile attrCondDefLibrary = findAttrCondDefLibrary(project.getFolder(SOURCE_FOLDER));
+		final var attrCondDefLibrary = findAttrCondDefLibrary(project.getFolder(SOURCE_FOLDER));
 		if (attrCondDefLibrary == null) {
 			createDefaultLibraryFile(project);
 		} else {
@@ -55,8 +53,8 @@ public class AttrCondDefLibraryProvider {
 	 * @throws CoreException if the resource cannot be created
 	 */
 	private static void createDefaultLibraryFile(final IProject project) throws CoreException {
-		final String defaultLib = DefaultFilesHelper.generateDefaultAttrCondDefLibrary();
-		final String projectName = project.getProject().getName().replace('.', '/');
+		final var defaultLib = DefaultFilesHelper.generateDefaultAttrCondDefLibrary();
+		final var projectName = project.getProject().getName().replace('.', '/');
 		final IPath pathToLib = new Path(SOURCE_FOLDER + "/" + projectName + PACKAGE_PATH_TO_LIBRARY + FILENAME);
 
 		addAllFoldersAndFile(project, pathToLib, defaultLib, new NullProgressMonitor());
@@ -68,7 +66,7 @@ public class AttrCondDefLibraryProvider {
 	 * @throws CoreException
 	 */
 	private static void removeLibraryModificationProblemMarkers(final IFile attrCondDefLibrary) throws CoreException {
-		final IMarker[] markers = attrCondDefLibrary.findMarkers(IMarker.PROBLEM, false, 1);
+		final var markers = attrCondDefLibrary.findMarkers(IMarker.PROBLEM, false, 1);
 		for (final IMarker marker : markers) {
 			if (getLibraryModificationWarningMessage().equals(marker.getAttribute(IMarker.MESSAGE))) {
 				marker.delete();
@@ -85,15 +83,15 @@ public class AttrCondDefLibraryProvider {
 	 * @throws CoreException
 	 */
 	private static void checkForModifiedLibrary(final IFile attrCondDefLibrary) throws CoreException {
-		try (final InputStream contents = attrCondDefLibrary.getContents();) {
-			final String currentContent = normalizeWhitespaces(IOUtils.toString(contents));
-			final String defaultContent = normalizeWhitespaces(DefaultFilesHelper.generateDefaultAttrCondDefLibrary());
+		try (final var contents = attrCondDefLibrary.getContents();) {
+			final var currentContent = normalizeWhitespaces(new String(contents.readAllBytes()));
+			final var defaultContent = normalizeWhitespaces(DefaultFilesHelper.generateDefaultAttrCondDefLibrary());
 			if (!currentContent.equals(defaultContent)) {
 
-				final String message = getLibraryModificationWarningMessage();
+				final var message = getLibraryModificationWarningMessage();
 
-				final IFile file = attrCondDefLibrary;
-				final IResource markedResource = file.exists() ? file : file.getProject();
+				final var file = attrCondDefLibrary;
+				final var markedResource = file.exists() ? file : file.getProject();
 				ProblemMarkerUtil.createProblemMarker(markedResource, message, IMarker.SEVERITY_WARNING,
 						markedResource.getProjectRelativePath().toString());
 
@@ -109,7 +107,7 @@ public class AttrCondDefLibraryProvider {
 	 * @return the warning message
 	 */
 	private static String getLibraryModificationWarningMessage() {
-		final String message = "The default attribute constraints library has been modified manually. " //
+		final var message = "The default attribute constraints library has been modified manually. " //
 				+ "Please consider using user-defined constraints in the schema file instead.";
 		return message;
 	}
@@ -151,16 +149,18 @@ public class AttrCondDefLibraryProvider {
 	 *             if a resource access fails
 	 */
 	public static IFile findAttrCondDefLibrary(final IContainer container) throws CoreException {
-		final IResource[] members = container.members();
+		final var members = container.members();
 
 		for (final IResource member : members) {
 			if (member instanceof IFile) {
-				if (member.getName().equals(fileName))
+				if (member.getName().equals(fileName)) {
 					return (IFile) member;
+				}
 			} else if (member instanceof IContainer) {
-				final IFile attrCondDefLibrary = findAttrCondDefLibrary((IContainer) member);
-				if (attrCondDefLibrary != null)
+				final var attrCondDefLibrary = findAttrCondDefLibrary((IContainer) member);
+				if (attrCondDefLibrary != null) {
 					return attrCondDefLibrary;
+				}
 			}
 		}
 

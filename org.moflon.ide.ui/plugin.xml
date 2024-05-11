@@ -121,33 +121,6 @@
                 </and>
             </enabledWhen>
         </handler>
-        <handler class="org.moflon.ide.ui.admin.handlers.ExportAndBuildHandler" commandId="org.moflon.ide.ui.commands.build.ExportAndBuild">
-            <enabledWhen>
-                <with variable="selection">
-                    <or>
-                        <iterate ifEmpty="false" operator="or">
-                            <or>
-                                <reference definitionId="org.moflon.ide.ui.definitions.isEapFile"></reference>
-                                <reference definitionId="org.moflon.ide.ui.definitions.hasMetamodelNature"></reference>
-                            </or>
-                        </iterate>
-                        <reference definitionId="org.moflon.ide.ui.definitions.isInPackageExplorer"></reference>
-                        <reference definitionId="org.moflon.ide.ui.definitions.isInProjectExplorer"></reference>
-                    </or>
-                </with>
-            </enabledWhen>
-        </handler>
-        <handler class="org.moflon.ide.ui.admin.handlers.ExportToEAPHandler" commandId="org.moflon.ide.ui.commands.ecore2mocaxmi.EAPExportCommand">
-            <enabledWhen>
-                <with variable="selection">
-                    <iterate ifEmpty="false">
-                        <or>
-                            <reference definitionId="org.moflon.ide.ui.definitions.isEcoreFile"></reference>
-                        </or>
-                    </iterate>
-                </with>
-            </enabledWhen>
-        </handler>
         <handler
               class="org.moflon.ide.ui.admin.handlers.CreateUserDefinedConstraintsLibraryHandler"
               commandId="org.moflon.ide.ui.commands.CreateUserDefinedConstraintsLibrary">

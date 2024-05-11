@@ -4,18 +4,14 @@ Bundle-Name: org.moflon.ide.core
 Bundle-SymbolicName: org.moflon.ide.core;singleton:=true
 Bundle-Version: 2.3.0.qualifier
 Bundle-Vendor: eMoflon Developers
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: 
  org.eclipse.core.runtime;bundle-version="[3.5.0,4.0.0)",
  org.eclipse.emf.ecore.xmi;bundle-version="[2.5.0,3.0.0)",
  org.eclipse.emf.codegen.ecore;bundle-version="[2.5.0,3.0.0)",
  org.eclipse.jdt.core;bundle-version="[3.5.2,4.0.0)",
- org.gervarro.eclipse.task;bundle-version="[1.0.1,2.0.0)",
- org.gervarro.eclipse.workspace.util;bundle-version="[2.0.0,3.0.0)",
- org.gervarro.eclipse.workspace.autosetup;bundle-version="[1.0.0,2.0.0)",
  org.moflon.core.utilities;bundle-version="1.3.0",
  org.moflon.core.propertycontainer;bundle-version="2.1.0",
- MocaTree;bundle-version="2.0.0",
  org.moflon.core.moca.processing;bundle-version="2.0.0",
  org.moflon.core.mocatomoflon;bundle-version="2.0.0",
  SDMLanguage;bundle-version="2.0.0",
@@ -25,14 +21,14 @@ Require-Bundle:
  org.moflon.tgg.runtime;bundle-version="2.0.0",
  org.moflon.tgg.language;bundle-version="2.1.0",
  org.moflon.core.plugins;bundle-version="2.2.0",
- org.moflon.core.build,
+ org.moflon.core.build;visibility:=reexport,
  org.moflon.core.preferences,
  org.moflon.emf.build,
  org.moflon.emf.codegen,
  org.moflon.core.plugins,
- org.antlr.stringtemplate
+ MocaTree,
+ org.gervarro.eclipse.workspace.util
 Export-Package: org.moflon.ide.core,
- org.moflon.ide.core.ea,
  org.moflon.ide.core.project,
  org.moflon.ide.core.properties,
  org.moflon.ide.core.runtime,

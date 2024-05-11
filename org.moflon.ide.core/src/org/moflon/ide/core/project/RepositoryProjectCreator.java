@@ -11,9 +11,6 @@ import org.moflon.core.plugins.PluginProperties;
 import org.moflon.core.propertycontainer.MetaModelProject;
 import org.moflon.core.propertycontainer.MoflonPropertiesContainer;
 import org.moflon.core.propertycontainer.PropertycontainerFactory;
-import org.moflon.core.propertycontainer.SDMCodeGeneratorIds;
-import org.moflon.ide.core.properties.MocaTreeEAPropertiesReader;
-import org.moflon.ide.core.properties.PluginPropertiesHelper;
 import org.moflon.ide.core.runtime.builders.RepositoryBuilder;
 import org.moflon.ide.core.runtime.natures.RepositoryNature;
 
@@ -27,7 +24,7 @@ public class RepositoryProjectCreator extends MoflonProjectCreator {
 
 	/**
 	 * Pass-through constructor to {@link MoflonProjectCreator}
-	 * 
+	 *
 	 * @param project
 	 *            the project to create
 	 * @param projectProperties
@@ -35,18 +32,9 @@ public class RepositoryProjectCreator extends MoflonProjectCreator {
 	 * @param projectConfigurator
 	 *            the project configurator
 	 */
-	public RepositoryProjectCreator(IProject project, PluginProperties projectProperties,
-			MoflonProjectConfigurator projectConfigurator) {
+	public RepositoryProjectCreator(final IProject project, final PluginProperties projectProperties,
+			final MoflonProjectConfigurator projectConfigurator) {
 		super(project, projectProperties, projectConfigurator);
-	}
-
-	@Override
-	protected SDMCodeGeneratorIds getCodeGeneratorHandler() {
-		if (PluginPropertiesHelper.hasAttributeConstraints(getPluginProperties())) {
-			return SDMCodeGeneratorIds.DEMOCLES_ATTRIBUTES;
-		} else {
-			return SDMCodeGeneratorIds.DEMOCLES;
-		}
 	}
 
 	@Override
@@ -62,16 +50,6 @@ public class RepositoryProjectCreator extends MoflonProjectCreator {
 	@Override
 	protected String getBuilderId() throws CoreException {
 		return RepositoryBuilder.getId();
-	}
-
-	@Override
-	protected void initializeMoflonProperties(final MoflonPropertiesContainer moflonProperties) {
-		super.initializeMoflonProperties(moflonProperties);
-
-		updateMetamodelProjectName(moflonProperties,
-				getPluginProperties().get(MocaTreeEAPropertiesReader.METAMODEL_PROJECT_NAME_KEY));
-		moflonProperties.setTGGBuildMode(null);
-
 	}
 
 	/**

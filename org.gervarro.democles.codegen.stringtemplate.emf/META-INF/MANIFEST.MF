@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Democles Stringtemplate EMF
+Bundle-SymbolicName: org.gervarro.democles.codegen.stringtemplate.emf
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.gervarro.democles.codegen.stringtemplate.emf
+Require-Bundle: org.eclipse.emf.codegen.ecore,
+ org.gervarro.democles.codegen.emf,
+ org.moflon.core.utilities,
+ org.gervarro.democles.emf
+Automatic-Module-Name: org.gervarro.democles.codegen.stringtemplate.emf
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-17

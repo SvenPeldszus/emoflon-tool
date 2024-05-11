@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Plan
+Bundle-SymbolicName: org.gervarro.democles.plan
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.gervarro.democles.plan,
+ org.gervarro.democles.plan.common
+Require-Bundle: org.gervarro.democles.common
+Automatic-Module-Name: org.gervarro.democles.plan
+Bundle-RequiredExecutionEnvironment: JavaSE-17

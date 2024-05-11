@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.moflon.core.build.MoflonProjectCreator;
 import org.moflon.core.build.nature.MoflonProjectConfigurator;
 import org.moflon.core.plugins.PluginProperties;
-import org.moflon.core.propertycontainer.SDMCodeGeneratorIds;
 import org.moflon.core.utilities.WorkspaceHelper;
 import org.moflon.ide.core.runtime.builders.MetamodelBuilder;
 import org.moflon.ide.core.runtime.natures.MetamodelNature;
@@ -22,7 +21,7 @@ public class MetamodelProjectCreator extends MoflonProjectCreator {
 
 	/**
 	 * Pass-through constructor to {@link MoflonProjectCreator}
-	 * 
+	 *
 	 * @param project
 	 *            the project to create
 	 * @param projectProperties
@@ -66,10 +65,4 @@ public class MetamodelProjectCreator extends MoflonProjectCreator {
 	protected String getBuilderId() throws CoreException {
 		return MetamodelBuilder.getId();
 	}
-
-	@Override
-	protected SDMCodeGeneratorIds getCodeGeneratorHandler() {
-		return null;
-	}
-
 }

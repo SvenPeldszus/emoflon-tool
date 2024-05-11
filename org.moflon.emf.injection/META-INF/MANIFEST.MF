@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: eMoflon::Core DSL for injections (main)
+Bundle-Vendor: eMoflon developers
+Bundle-Version: 1.0.0.201812291352
+Bundle-SymbolicName: org.moflon.emf.injection; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.equinox.common,
+ org.moflon.core.utilities,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ org.eclipse.emf.mwe2.launch
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: org.moflon.emf.injection,org.moflon.emf.injection.gene
+ rator,org.moflon.emf.injection.injectionLanguage,org.moflon.emf.injec
+ tion.injectionLanguage.impl,org.moflon.emf.injection.injectionLanguag
+ e.util,org.moflon.emf.injection.parser.antlr,org.moflon.emf.injection
+ .parser.antlr.internal,org.moflon.emf.injection.scoping,org.moflon.em
+ f.injection.serializer,org.moflon.emf.injection.services,org.moflon.e
+ mf.injection.unparsing,org.moflon.emf.injection.validation
+Import-Package: org.apache.log4j
+Automatic-Module-Name: org.moflon.emf.injection
+Bundle-ClassPath: .
+
+

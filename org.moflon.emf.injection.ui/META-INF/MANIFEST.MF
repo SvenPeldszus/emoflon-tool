@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: eMoflon::Core DSL for injections (UI)
+Bundle-Vendor: eMoflon developers
+Bundle-Version: 1.1.0.201812291352
+Bundle-SymbolicName: org.moflon.emf.injection.ui; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.moflon.emf.injection,org.moflon.emf.injection.ide,
+ org.eclipse.xtext.ui,org.eclipse.xtext.ui.shared,org.eclipse.xtext.ui
+ .codetemplates.ui,org.eclipse.ui.editors;bundle-version="3.5.0",org.e
+ clipse.ui.ide;bundle-version="3.5.0",org.eclipse.ui,org.eclipse.compa
+ re,org.eclipse.xtext.builder,org.eclipse.xtend.lib;resolution:=option
+ al,org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",org.eclipse.em
+ f.codegen.ecore,org.moflon.core.utilities,org.eclipse.jdt.core,org.ec
+ lipse.jdt.ui,org.eclipse.jdt.core.manipulation,org.moflon.core.ui
+Import-Package: org.apache.log4j
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: org.moflon.emf.injection.build,org.moflon.emf.injectio
+ n.ui.contentassist,org.moflon.emf.injection.ui.internal,org.moflon.em
+ f.injection.ui.quickfix
+Bundle-Activator: org.moflon.emf.injection.ui.internal.InjectionActiva
+ tor
+Automatic-Module-Name: org.moflon.emf.injection.ui
+Bundle-ClassPath: .
+
+

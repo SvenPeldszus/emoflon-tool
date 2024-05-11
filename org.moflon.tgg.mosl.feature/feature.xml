@@ -31,48 +31,31 @@ See here for more details on EPL: http://www.eclipse.org/org/documents/epl-v10.p
    <requires>
       <import feature="org.moflon.ide.feature" version="3.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.xtext.xbase" version="2.9.1" match="greaterOrEqual"/>
-      <import feature="org.moflon.ide.visualization.feature" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.mwe2.launch"/>
    </requires>
 
    <plugin
          id="org.moflon.tgg.mosl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.moflon.tgg.mosl.codeadapter"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="org.moflon.tgg.mosl.ui"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="org.moflon.tgg.runtime"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.moflon.tgg.tggproject"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.moflon.tgg.mosl.ide"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
